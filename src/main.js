@@ -5,6 +5,7 @@ import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 import ElementPlus from 'element-plus'
 import 'element-plus/lib/theme-chalk/index.css'
 import locale from 'element-plus/lib/locale/lang/zh-cn' // lang i18n
+import SvgIcon from '@/components/SvgIcon'// svg component
 
 import '@/styles/index.scss' // global css
 
@@ -31,5 +32,6 @@ const app = createApp(App)
 app.use(ElementPlus, {locale})
 app.use(router)
 app.use(store)
+app.component('svg-icon', SvgIcon)
 app.config.productionTip = false
 app.mount('#app')
