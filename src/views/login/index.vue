@@ -47,19 +47,17 @@
         </span>
       </el-form-item>
 
-      <el-form-item prop="verifyCode">
-        <el-image
-          style="width: 150px; height: 50px"
-          :src="url"
-          :fit="fit"
-          @click="changeVerifyCode"
-        />
-      </el-form-item>
+      <img
+        style="width: 150px; height: 50px"
+        :src="url"
+        alt="验证码加载失败"
+        @click="changeVerifyCode"
+      />
       <el-button
         :loading="loading"
         type="primary"
         style="width:100%;margin-bottom:30px;"
-        @click.native.prevent="handleLogin">Login
+        @click.native.prevent="handleLogin">
       </el-button>
 
       <div class="tips">
@@ -143,7 +141,7 @@ export default {
       })
     },
     changeVerifyCode() {
-      this.url = '/api/getCaptcha' + '?t=' + new Date().getTime()
+      this.url = '/api/getCaptcha?t=' + new Date().getTime()
     }
   }
 }
