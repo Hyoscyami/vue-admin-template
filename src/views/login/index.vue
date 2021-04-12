@@ -47,7 +47,7 @@
         </span>
       </el-form-item>
       <el-row :gutter="20">
-        <el-col :span="10">
+        <el-col :span="12">
           <el-form-item prop="verifyCode">
             <el-input
               v-model="loginForm.verifyCode"
@@ -58,7 +58,7 @@
             />
           </el-form-item>
         </el-col>
-        <el-col :span="7" :offset="5">
+        <el-col :span="6" :offset="3">
           <img
             style="width: 150px; height: 50px"
             :src="url"
@@ -82,6 +82,7 @@
 
 <script>
 import {validUsername} from '@/utils/validate'
+import request from '@/utils/request'
 
 export default {
   name: 'Login',
@@ -109,9 +110,9 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111',
-        verifyCode: undefined
+        username: '',
+        password: '',
+        verifyCode: ''
       },
       loginRules: {
         username: [{required: true, trigger: 'blur', validator: validateUsername}],
@@ -122,7 +123,7 @@ export default {
       passwordType: 'password',
       redirect: undefined,
       fits: ['fill', 'contain', 'cover', 'none', 'scale-down'],
-      url: '/api/getCaptcha'
+      url: ''
     }
   },
   watch: {
@@ -132,6 +133,10 @@ export default {
       },
       immediate: true
     }
+  },
+  mounted() {
+    // 验证码初始化
+    this.changeVerifyCode()
   },
   methods: {
     showPwd() {
@@ -161,7 +166,10 @@ export default {
       })
     },
     changeVerifyCode() {
-      this.url = '/api/getCaptcha?t=' + new Date().getTime()
+      request({url: '/getCaptcha', method: 'get'}).then(response => {
+        console.log(response)
+        this.url = response.data.verifyCodeStr
+      })
     }
   }
 }
