@@ -9,7 +9,7 @@ import SvgIcon from '@/components/SvgIcon'// svg component
 
 import '@/styles/index.scss' // global css
 
-import App from './App'
+import App from '@/App.vue'
 import store from '@/store'
 import router from '@/router'
 
