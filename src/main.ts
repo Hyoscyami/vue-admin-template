@@ -33,5 +33,4 @@ app.use(ElementPlus, {locale})
 app.use(router)
 app.use(store)
 app.component('svg-icon', SvgIcon)
-app.config.productionTip = false
 app.mount('#app')
