@@ -5,11 +5,10 @@
   </svg>
 </template>
 
-<script>
+<script lang="ts">
 // doc: https://panjiachen.github.io/vue-element-admin-site/feature/component/svg-icon.html#usage
-import { isExternal } from '@/utils/validate'
-
-export default {
+import {computed, defineComponent} from 'vue'
+export default defineComponent({
   name: 'SvgIcon',
   props: {
     iconClass: {
@@ -19,30 +18,30 @@ export default {
     className: {
       type: String,
       default: ''
-    }
-  },
-  computed: {
-    isExternal() {
-      return isExternal(this.iconClass)
     },
-    iconName() {
-      return `#icon-${this.iconClass}`
-    },
-    svgClass() {
-      if (this.className) {
-        return 'svg-icon ' + this.className
-      } else {
-        return 'svg-icon'
-      }
-    },
-    styleExternalIcon() {
-      return {
-        mask: `url(${this.iconClass}) no-repeat 50% 50%`,
-        '-webkit-mask': `url(${this.iconClass}) no-repeat 50% 50%`
-      }
+    setup() {
+      const isExternal = computed(() => {
+        return /^(https?:|mailto:|tel:)/.test(this.iconClass)
+      })
+      const iconName = computed(() => {
+        return `#icon-${this.iconClass}`
+      })
+      const svgClass = computed(() => {
+        if (this.className) {
+          return 'svg-icon ' + this.className
+        } else {
+          return 'svg-icon'
+        }
+      })
+      const styleExternalIcon = computed(() => {
+        return {
+          mask: `url(${this.iconClass}) no-repeat 50% 50%`,
+          '-webkit-mask': `url(${this.iconClass}) no-repeat 50% 50%`
+        }
+      })
     }
   }
-}
+})
 </script>
 
 <style scoped>

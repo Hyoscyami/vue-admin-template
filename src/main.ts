@@ -5,7 +5,7 @@ import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 import ElementPlus from 'element-plus'
 import 'element-plus/lib/theme-chalk/index.css'
 import locale from 'element-plus/lib/locale/lang/zh-cn' // lang i18n
-import SvgIcon from '@/components/SvgIcon.vue'// svg component
+import SvgIcon from '@/components/SvgIcon/index.vue'// svg component
 
 import '@/styles/index.scss' // global css
 
@@ -14,7 +14,7 @@ import store from '@/store'
 import router from '@/router'
 
 import '@/icons' // icon
-import '@/permission' // permission control
+import './permission' // permission control
 
 /**
  * If you don't want to use mock-server
