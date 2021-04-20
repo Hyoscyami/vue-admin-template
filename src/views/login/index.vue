@@ -167,7 +167,6 @@ export default {
     },
     changeVerifyCode() {
       request({url: '/getCaptcha', method: 'get'}).then(response => {
-        console.log(response)
         this.url = response.data.verifyCodeStr
       })
     }
