@@ -112,7 +112,8 @@ export default {
       loginForm: {
         username: '',
         password: '',
-        verifyCode: ''
+        verifyCode: '',
+        verifyCodeId: ''
       },
       loginRules: {
         username: [{required: true, trigger: 'blur', validator: validateUsername}],
@@ -168,6 +169,7 @@ export default {
     changeVerifyCode() {
       request({url: '/getCaptcha', method: 'get'}).then(response => {
         this.url = response.data.verifyCodeStr
+        this.loginForm.verifyCodeId = response.data.id
       })
     }
   }
