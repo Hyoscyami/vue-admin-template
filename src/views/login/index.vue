@@ -40,7 +40,6 @@
           name="password"
           tabindex="2"
           auto-complete="on"
-          @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
@@ -55,6 +54,7 @@
               type="text"
               name="verifyCode"
               tabindex="3"
+              @keyup.enter.native="handleLogin"
             />
           </el-form-item>
         </el-col>
