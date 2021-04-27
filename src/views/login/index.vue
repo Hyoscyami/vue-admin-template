@@ -54,6 +54,7 @@
               type="text"
               name="verifyCode"
               tabindex="3"
+              maxlength="5"
               @keyup.enter.native="handleLogin"
             />
           </el-form-item>
