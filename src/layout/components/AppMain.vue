@@ -5,9 +5,6 @@
         <component :is="Component" />
       </transition>
     </router-view>
-    <!--    <transition name="fade-transform" mode="out-in">-->
-    <!--      <router-view :key="key" />-->
-    <!--    </transition>-->
   </section>
 </template>
 
