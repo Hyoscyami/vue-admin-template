@@ -52,6 +52,27 @@ export const constantRoutes = [
     }]
   },
 
+  {
+    path: '/sys',
+    component: Layout,
+    redirect: '/sys/org',
+    name: 'sys',
+    meta: {title: '系统管理', icon: 'el-icon-s-help'},
+    children: [
+      {
+        path: 'org',
+        name: 'Org',
+        component: () => import('@/views/sys/org'),
+        meta: {title: '组织管理', icon: 'table'}
+      },
+      {
+        path: 'permission',
+        name: 'Permission',
+        component: () => import('@/views/sys/permission'),
+        meta: {title: '权限管理', icon: 'tree'}
+      }
+    ]
+  },
   // 404 page must be placed at the end !!!
   {path: '/:catchAll(.*)', redirect: '/404', hidden: true}
 ]
