@@ -9,7 +9,6 @@
         <el-tree
           ref="tree"
           :props="treeProps"
-          :data="treeData"
           :load="loadDirectChildNodes"
           :filter-node-method="filterNode"
           lazy
@@ -23,7 +22,7 @@
 </template>
 
 <script>
-import {isEmptyCollection} from '@/utils/common'
+import request from '@/utils/request'
 
 export default {
   name: 'Permission',
@@ -36,8 +35,10 @@ export default {
         label: 'name',
         children: 'zones'
       },
+      // 根节点
+      rootNode: {},
       // 树的数据
-      treeData: []
+      childrenTreeData: []
     }
   },
   watch: {
@@ -47,23 +48,20 @@ export default {
     }
   },
   mounted() {
-    // 初始化树
+    // 初始化根节点
     this.initTree()
   },
   methods: {
     /**
-     * 初始化树
-     */
-    initTree() {
-      console.log('开始初始化树')
-      this.treeData = this.getTreeRootNode()
-    },
-    /**
      * 获取根节点
      */
-    getTreeRootNode() {
-      console.log('开始获取根节点')
-      return [{name: '根节点'}]
+    initTree() {
+      request({
+        url: '/permission/getRootPermission',
+        method: 'get'
+      }).then(response => {
+        this.rootNode = response.data
+      })
     },
     /**
      * 根据id获取直接子节点
@@ -90,10 +88,9 @@ export default {
      */
     loadDirectChildNodes(node, resolve) {
       console.log('开始加载子树方法，node:', node)
-      if (isEmptyCollection(node.children)) {
-        node.isLeaf = true
-      } else {
-        node.isLeaf = false
+      if (node.level === 0) {
+        console.log('开始初始化根节点', this.rootNode)
+        return resolve([this.rootNode])
       }
     }
   }
