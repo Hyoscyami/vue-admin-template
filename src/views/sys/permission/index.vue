@@ -9,7 +9,8 @@
         <el-tree
           ref="tree"
           :props="treeProps"
-          :data="treeData"
+          :data="childrenData"
+          node-key="id"
           :load="loadDirectChildNodes"
           :filter-node-method="filterNode"
           lazy
@@ -24,6 +25,7 @@
 
 <script>
 import {isEmptyCollection} from '@/utils/common'
+import request from '@/utils/request'
 
 export default {
   name: 'Permission',
@@ -36,8 +38,10 @@ export default {
         label: 'name',
         children: 'zones'
       },
-      // 树的数据
-      treeData: []
+      // 根节点
+      rootNode: {},
+      // 节点的孩子节点的数据
+      childrenData: []
     }
   },
   watch: {
@@ -56,21 +60,19 @@ export default {
      */
     initTree() {
       console.log('开始初始化树')
-      this.treeData = this.getTreeRootNode()
     },
     /**
      * 获取根节点
      */
     getTreeRootNode() {
-      console.log('开始获取根节点')
-      return [{name: '根节点'}]
+      request()
     },
     /**
      * 根据id获取直接子节点
      * @param id 当前节点id
      */
     getChildrenNode(id) {
-
+      request()
     },
     /**
      * 过滤tree的节点
