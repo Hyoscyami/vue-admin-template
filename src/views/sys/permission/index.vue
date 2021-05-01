@@ -9,7 +9,8 @@
         <el-tree
           ref="tree"
           :props="treeProps"
-          :load="loadDirectChildNodes"
+          node-key="id"
+          :load="loadNode"
           :filter-node-method="filterNode"
           lazy
         />
@@ -32,12 +33,11 @@ export default {
       filterTreeText: '',
       // 树的属性重命名
       treeProps: {
-        label: 'name',
-        children: 'zones'
+        label: 'name'
       },
       // 根节点
       rootNode: {},
-      // 树的数据
+      // 子树的数据
       childrenTreeData: []
     }
   },
@@ -47,20 +47,17 @@ export default {
       this.$refs.tree.filter(val)
     }
   },
-  mounted() {
-    // 初始化根节点
-    this.initTree()
-  },
   methods: {
     /**
      * 获取根节点
      */
-    initTree() {
-      request({
+    async initTree() {
+      await request({
         url: '/permission/getRootPermission',
         method: 'get'
       }).then(response => {
         this.rootNode = response.data
+        console.log('获取到根节点', this.rootNode)
       })
     },
     /**
@@ -68,7 +65,13 @@ export default {
      * @param id 当前节点id
      */
     getChildrenNode(id) {
-
+      request({
+        url: '/permission/listChildren',
+        method: 'get'
+      }).then(response => {
+        this.childrenTreeData = response.data
+        console.log('节点子节点数据', this.childrenTreeData)
+      })
     },
     /**
      * 过滤tree的节点
@@ -86,9 +89,10 @@ export default {
      * @param resolve
      * @returns {*}
      */
-    loadDirectChildNodes(node, resolve) {
-      console.log('开始加载子树方法，node:', node)
+    async loadNode(node, resolve) {
+      console.log('开始加载树，node:', node)
       if (node.level === 0) {
+        await this.initTree()
         console.log('开始初始化根节点', this.rootNode)
         return resolve([this.rootNode])
       }
