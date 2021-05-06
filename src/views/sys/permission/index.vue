@@ -64,10 +64,11 @@ export default {
      * 根据id获取直接子节点
      * @param id 当前节点id
      */
-    getChildrenNode(id) {
-      request({
+    async getChildrenNode(id) {
+      await request({
         url: '/permission/listChildren',
-        method: 'get'
+        method: 'get',
+        params: {id}
       }).then(response => {
         this.childrenTreeData = response.data
         console.log('节点子节点数据', this.childrenTreeData)
@@ -95,6 +96,11 @@ export default {
         await this.initTree()
         console.log('开始初始化根节点', this.rootNode)
         return resolve([this.rootNode])
+      }
+      if (node.level > 0) {
+        await this.getChildrenNode(node.data.id)
+        console.log('获取子节点')
+        return resolve[this.childrenTreeData]
       }
     }
   }
