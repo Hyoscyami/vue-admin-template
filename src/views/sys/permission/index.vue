@@ -16,8 +16,8 @@
         />
       </el-col>
       <el-col :span="18">
-        <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
-          <el-form-item label="活动名称" prop="name">
+        <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px">
+          <el-form-item label="权限名称" prop="name">
             <el-input v-model="ruleForm.name" />
           </el-form-item>
           <el-form-item label="活动区域" prop="region">
