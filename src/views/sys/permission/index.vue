@@ -16,7 +16,11 @@
         />
       </el-col>
       <el-col :span="18">
-        <p>这里编辑权限</p>
+        <el-form>
+          <el-form-item label="权限名称">
+            <el-input />
+          </el-form-item>
+        </el-form>
       </el-col>
     </el-row>
   </div>
@@ -98,9 +102,9 @@ export default {
         return resolve([this.rootNode])
       }
       if (node.level > 0) {
+        console.log('获取子节点:', node.data.id)
         await this.getChildrenNode(node.data.id)
-        console.log('获取子节点')
-        return resolve[this.childrenTreeData]
+        return resolve(this.childrenTreeData)
       }
     }
   }
