@@ -30,7 +30,7 @@ import Layout from '@/layout'
 export const constantRoutes = [
   {
     path: '/login',
-    component: () => import('@/views/login/index'),
+    component: () => import('@/views/login/login'),
     hidden: true
   },
 
@@ -47,7 +47,7 @@ export const constantRoutes = [
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
+      component: () => import('@/views/dashboard/dashboard'),
       meta: {title: '首页', icon: 'dashboard'}
     }]
   },
@@ -62,14 +62,20 @@ export const constantRoutes = [
       {
         path: 'org',
         name: 'Org',
-        component: () => import('@/views/sys/org'),
+        component: () => import('@/views/sys/org/org'),
         meta: {title: '组织管理', icon: 'table'}
       },
       {
         path: 'permission',
         name: 'Permission',
-        component: () => import('@/views/sys/permission'),
+        component: () => import('@/views/sys/permission/permission'),
         meta: {title: '权限管理', icon: 'tree'}
+      },
+      {
+        path: 'dict',
+        name: 'Dict',
+        component: () => import('@/views/sys/dict/dict'),
+        meta: {title: '字典管理', icon: 'table'}
       }
     ]
   },
