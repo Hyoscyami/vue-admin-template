@@ -25,7 +25,7 @@ service.interceptors.request.use(
   },
   error => {
     // do something with request error
-    console.log(error) // for debug
+    console.log('request error:', error) // for debug
     return Promise.reject(error)
   }
 )
@@ -74,7 +74,7 @@ service.interceptors.response.use(
   error => {
     console.log('err' + error) // for debug
     ElMessage({
-      message: error.response.msg,
+      message: error.response.data.msg,
       type: 'error',
       duration: 5 * 1000
     })
