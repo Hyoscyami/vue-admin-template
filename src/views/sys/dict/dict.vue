@@ -25,18 +25,23 @@
       style="width: 100%"
     >
       <el-table-column
-        prop="date"
-        label="日期"
+        prop="code"
+        label="码值"
         width="180"
       />
       <el-table-column
-        prop="name"
-        label="姓名"
+        prop="value"
+        label="值"
         width="180"
       />
       <el-table-column
-        prop="address"
-        label="地址"
+        prop="description"
+        label="描述"
+      />
+      <el-table-column
+        prop="enable"
+        label="状态"
+        :formatter="enableFormat"
       />
       <el-table-column
         fixed="right"
@@ -58,21 +63,25 @@ export default {
   data() {
     return {
       tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
+        code: '2016-05-02',
+        value: '王小虎',
+        description: '上海市普陀区金沙江路 1518 弄',
+        enable: true
       }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
+        code: '2016-05-04',
+        value: '王小虎',
+        description: '上海市普陀区金沙江路 1517 弄',
+        enable: false
       }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
+        code: '2016-05-01',
+        value: '王小虎',
+        description: '上海市普陀区金沙江路 1519 弄',
+        enable: true
       }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
+        code: '2016-05-03',
+        value: '王小虎',
+        description: '上海市普陀区金沙江路 1516 弄',
+        enable: true
       }],
       formInline: {
         code: '',
@@ -90,6 +99,13 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
+    },
+    // 格式换数据字典状态
+    enableFormat(row, column) {
+      if (row.enable) {
+        return '已启用'
+      }
+      return '已禁用'
     }
   }
 }
