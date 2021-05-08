@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-form ref="formInline" :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form ref="formInline" :inline="true" :model="formInline">
         <el-form-item label="字典值" prop="code">
           <el-input v-model="formInline.code" placeholder="字典值" />
         </el-form-item>
@@ -19,7 +19,7 @@
           <el-button @click="resetForm('formInline')">重置</el-button>
         </el-form-item>
       </el-form>
-      <el-button class="filter-item" type="primary" icon="el-icon-edit">
+      <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="addDialogFormVisible=true">
         新增
       </el-button>
     </div>
@@ -27,6 +27,10 @@
       :data="tableData"
       style="width: 100%"
     >
+      <el-table-column
+        type="selection"
+        width="55"
+      />
       <el-table-column
         prop="code"
         label="码值"
@@ -44,30 +48,39 @@
       <el-table-column
         prop="enable"
         label="状态"
-        :formatter="enableFormat"
-      />
+      >
+        <template #default="scope">
+          <el-switch v-model="scope.row.enable" />
+        </template>
+      </el-table-column>
       <el-table-column
         fixed="right"
         label="操作"
         width="100"
       >
         <template #default="scope">
-          <el-button type="text" size="small" @click="handleClick(scope.row)">查看</el-button>
           <el-button type="text" size="small">编辑</el-button>
+          <el-button type="text" size="small" @click="handleClick(scope.row)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <el-dialog v-model="addDialogFormVisible" title="新增数据字典">
-      <el-form :model="form">
-        <el-form-item label="活动名称" :label-width="formLabelWidth">
-          <el-input v-model="form.name" autocomplete="off" />
+      <el-form ref="addForm" :model="addForm" label-width="80px">
+        <el-form-item label="码值">
+          <el-input v-model="addForm.code" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="活动区域" :label-width="formLabelWidth">
-          <el-select v-model="form.region" placeholder="请选择活动区域">
-            <el-option label="区域一" value="shanghai" />
-            <el-option label="区域二" value="beijing" />
-          </el-select>
+        <el-form-item label="名称">
+          <el-input v-model="addForm.name" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input v-model="addForm.description" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-radio-group v-model="addForm.status">
+            <el-radio v-model="addForm.status" :label="true">启用</el-radio>
+            <el-radio v-model="addForm.status" :label="false">禁用</el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -77,6 +90,7 @@
         </span>
       </template>
     </el-dialog>
+
   </div>
 </template>
 
@@ -115,7 +129,10 @@ export default {
       addDialogFormVisible: false,
       // 新增数据字段表单
       addForm: {
-
+        code: '',
+        name: '',
+        description: '',
+        status: true
       }
     }
   },
