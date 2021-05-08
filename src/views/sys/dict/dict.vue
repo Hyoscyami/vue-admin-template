@@ -19,6 +19,9 @@
           <el-button @click="resetForm('formInline')">重置</el-button>
         </el-form-item>
       </el-form>
+      <el-button class="filter-item" type="primary" icon="el-icon-edit">
+        新增
+      </el-button>
     </div>
     <el-table
       :data="tableData"
@@ -54,6 +57,26 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog v-model="addDialogFormVisible" title="新增数据字典">
+      <el-form :model="form">
+        <el-form-item label="活动名称" :label-width="formLabelWidth">
+          <el-input v-model="form.name" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="活动区域" :label-width="formLabelWidth">
+          <el-select v-model="form.region" placeholder="请选择活动区域">
+            <el-option label="区域一" value="shanghai" />
+            <el-option label="区域二" value="beijing" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="addDialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addDialogFormVisible = false">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -87,6 +110,12 @@ export default {
         code: '',
         description: '',
         enable: undefined
+      },
+      // 新增数据字典弹框
+      addDialogFormVisible: false,
+      // 新增数据字段表单
+      addForm: {
+
       }
     }
   },
