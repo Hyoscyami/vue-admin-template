@@ -15,11 +15,11 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">查询</el-button>
+          <el-button type="primary" @click="searchFormSubmit">查询</el-button>
           <el-button @click="resetForm('formInline')">重置</el-button>
         </el-form-item>
       </el-form>
-      <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="addDialogFormVisible=true">
+      <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="openAddDialog">
         新增
       </el-button>
     </div>
@@ -66,27 +66,30 @@
     </el-table>
 
     <el-dialog v-model="addDialogFormVisible" title="新增数据字典">
-      <el-form ref="addForm" :model="addForm" label-width="80px">
-        <el-form-item label="码值">
+      <el-form ref="addForm" :model="addForm" :rules="addFormRules" label-width="80px">
+        <el-form-item label="码值" prop="code">
           <el-input v-model="addForm.code" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="名称">
+        <el-form-item label="名称" prop="name">
           <el-input v-model="addForm.name" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item label="描述" prop="description">
           <el-input v-model="addForm.description" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="状态">
+        <el-form-item label="排序值" prop="sort">
+          <el-input v-model="addForm.sort" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
           <el-radio-group v-model="addForm.status">
-            <el-radio v-model="addForm.status" :label="true">启用</el-radio>
-            <el-radio v-model="addForm.status" :label="false">禁用</el-radio>
+            <el-radio v-model="addForm.status" :label="1">启用</el-radio>
+            <el-radio v-model="addForm.status" :label="0">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="addDialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="addDialogFormVisible = false">确 定</el-button>
+          <el-button @click="cancelAddForm">取 消</el-button>
+          <el-button type="primary" @click="addFormSubmit">确 定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -95,6 +98,9 @@
 </template>
 
 <script>
+import request from '@/utils/request'
+import {ElMessage} from 'element-plus'
+
 export default {
   name: 'Dict',
   data() {
@@ -132,12 +138,33 @@ export default {
         code: '',
         name: '',
         description: '',
-        status: true
+        status: 1,
+        sort: 1
+      },
+      // 新增数据字典规则
+      addFormRules: {
+        code: [
+          { required: true, message: '请输入码值', trigger: 'blur' },
+          { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
+        ],
+        name: [
+          { required: true, message: '请输入名称', trigger: 'change' }
+        ],
+        description: [
+          { required: true, message: '请输入描述信息', trigger: 'change' }
+        ],
+        status: [
+          { required: true, message: '请选择状态', trigger: 'change' }
+        ],
+        sort: [
+          { required: true, message: '请填写排序值', trigger: 'change' }
+        ]
       }
     }
   },
   methods: {
-    onSubmit() {
+    // 搜索数据字典表单查询
+    searchFormSubmit() {
       console.log('submit!')
     },
     handleClick(row) {
@@ -152,6 +179,42 @@ export default {
         return '已启用'
       }
       return '已禁用'
+    },
+    // 打开新增数据字典对话框
+    openAddDialog() {
+      this.addDialogFormVisible = true
+      this.getMaxSort()
+    },
+    // 获取当前最大排序值
+    getMaxSort() {
+      request({
+        url: '/dict/getMaxSort',
+        method: 'get'
+      }).then(response => {
+        this.addForm.sort = response.data
+      })
+    },
+    // 新增数据字典表单提交
+    addFormSubmit() {
+      this.$refs['addForm'].validate((valid) => {
+        if (valid) {
+          const param = JSON.stringify(this.addForm)
+          request({
+            url: '/dict/add',
+            method: 'post',
+            params: param
+          }).then(response => {
+            this.cancelAddForm()
+          })
+        } else {
+          return false
+        }
+      })
+    },
+    // 新增数据字典表单取消
+    cancelAddForm() {
+      this.resetForm('addForm')
+      this.addDialogFormVisible = false
     }
   }
 }
