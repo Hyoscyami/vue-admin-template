@@ -19,10 +19,11 @@ export function del(id) {
   })
 }
 
-export function getMaxSort() {
+export function getMaxSort(id) {
   return request({
     url: '/dict/getMaxSort',
-    method: 'get'
+    method: 'get',
+    params: {parentId: id}
   })
 }
 

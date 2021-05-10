@@ -97,6 +97,9 @@
             <el-form-item label="码值" prop="code">
               <el-input v-model="addForm.code" autocomplete="off" />
             </el-form-item>
+            <el-form-item label="字典名称" prop="name">
+              <el-input v-model="addForm.name" autocomplete="off" />
+            </el-form-item>
             <el-form-item label="值" prop="value">
               <el-input v-model="addForm.value" autocomplete="off" />
             </el-form-item>
@@ -178,6 +181,7 @@ export default {
       // 新增数据字段表单
       addForm: {
         code: '',
+        name: '',
         value: '',
         description: '',
         status: 1,
@@ -190,11 +194,14 @@ export default {
           { required: true, message: '请输入码值', trigger: 'blur' },
           { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
         ],
+        name: [
+          { required: true, message: '请输入字典名称', trigger: 'change' }
+        ],
         value: [
-          {message: '请输入值', trigger: 'change' }
+          { required: true, message: '请输入值', trigger: 'change' }
         ],
         description: [
-          { required: true, message: '请输入描述信息', trigger: 'change' }
+          { message: '请输入描述信息', trigger: 'change' }
         ],
         status: [
           { required: true, message: '请选择状态', trigger: 'change' }
@@ -228,11 +235,12 @@ export default {
       }
       this.addDialogFormVisible = true
       this.dialogStatus = 'create'
-      this.getMaxSort()
+      this.getMaxSort(this.checkedNode.id)
+      this.addForm.parentId = this.checkedNode.id
     },
     // 获取当前最大排序值
-    getMaxSort() {
-      getMaxSort().then(response => {
+    getMaxSort(id) {
+      getMaxSort(id).then(response => {
         this.addForm.sort = response.data
       })
     },
