@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-form ref="formInline" :inline="true" :model="formInline">
+      <el-form ref="formInline" :inline="true" :model="searchFormInline">
         <el-form-item label="字典值" prop="code">
-          <el-input v-model="formInline.code" placeholder="字典值" />
+          <el-input v-model="searchFormInline.code" placeholder="字典值" />
         </el-form-item>
         <el-form-item label="描述" prop="description">
-          <el-input v-model="formInline.description" placeholder="描述" />
+          <el-input v-model="searchFormInline.description" placeholder="描述" />
         </el-form-item>
         <el-form-item label="状态" prop="enable">
-          <el-select v-model="formInline.enable" placeholder="状态">
+          <el-select v-model="searchFormInline.enable" placeholder="状态">
             <el-option label="启用" value="true" />
             <el-option label="禁用" value="false" />
           </el-select>
@@ -65,6 +65,8 @@
       </el-table-column>
     </el-table>
 
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+
     <el-dialog v-model="addDialogFormVisible" title="新增数据字典">
       <el-form ref="addForm" :model="addForm" :rules="addFormRules" label-width="80px">
         <el-form-item label="码值" prop="code">
@@ -98,35 +100,24 @@
 </template>
 
 <script>
-import request from '@/utils/request'
-import {ElMessage} from 'element-plus'
+import {add, getMaxSort, list} from '@/api/sys/dict'
+import Pagination from '@/components/Pagination'
 
 export default {
   name: 'Dict',
+  components: { Pagination },
   data() {
     return {
-      tableData: [{
-        code: '2016-05-02',
-        value: '王小虎',
-        description: '上海市普陀区金沙江路 1518 弄',
-        enable: true
-      }, {
-        code: '2016-05-04',
-        value: '王小虎',
-        description: '上海市普陀区金沙江路 1517 弄',
-        enable: false
-      }, {
-        code: '2016-05-01',
-        value: '王小虎',
-        description: '上海市普陀区金沙江路 1519 弄',
-        enable: true
-      }, {
-        code: '2016-05-03',
-        value: '王小虎',
-        description: '上海市普陀区金沙江路 1516 弄',
-        enable: true
-      }],
-      formInline: {
+      // 父数据字段表格数据
+      tableData: [],
+      total: 0,
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 20
+      },
+      // 查询条件表单
+      searchFormInline: {
         code: '',
         description: '',
         enable: undefined
@@ -139,7 +130,8 @@ export default {
         name: '',
         description: '',
         status: 1,
-        sort: 1
+        sort: 1,
+        parentId: 0
       },
       // 新增数据字典规则
       addFormRules: {
@@ -161,6 +153,10 @@ export default {
         ]
       }
     }
+  },
+  created() {
+    // 加载父数据字段列表
+    this.getList()
   },
   methods: {
     // 搜索数据字典表单查询
@@ -187,10 +183,7 @@ export default {
     },
     // 获取当前最大排序值
     getMaxSort() {
-      request({
-        url: '/dict/getMaxSort',
-        method: 'get'
-      }).then(response => {
+      getMaxSort().then(response => {
         this.addForm.sort = response.data
       })
     },
@@ -198,12 +191,7 @@ export default {
     addFormSubmit() {
       this.$refs['addForm'].validate((valid) => {
         if (valid) {
-          const param = JSON.stringify(this.addForm)
-          request({
-            url: '/dict/add',
-            method: 'post',
-            params: param
-          }).then(response => {
+          add(JSON.stringify(this.addForm)).then(response => {
             this.cancelAddForm()
           })
         } else {
@@ -215,6 +203,16 @@ export default {
     cancelAddForm() {
       this.resetForm('addForm')
       this.addDialogFormVisible = false
+    },
+    // 获取父数据字段列表数据
+    getList() {
+      this.listLoading = true
+      list(this.listQuery).then(response => {
+        this.tableData = response.data.records
+        this.total = response.data.total
+        console.log('total', this.total)
+        this.listLoading = false
+      })
     }
   }
 }

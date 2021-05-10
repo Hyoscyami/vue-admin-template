@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import request from '@/utils/request'
+import {getRootPermission, listChildren} from '@/api/sys/permission'
 
 export default {
   name: 'Permission',
@@ -136,10 +136,7 @@ export default {
      * 获取根节点
      */
     async initTree() {
-      await request({
-        url: '/permission/getRootPermission',
-        method: 'get'
-      }).then(response => {
+      getRootPermission().then(response => {
         this.rootNode = response.data
         console.log('获取到根节点', this.rootNode)
       })
@@ -149,11 +146,7 @@ export default {
      * @param id 当前节点id
      */
     async getChildrenNode(id) {
-      await request({
-        url: '/permission/listChildren',
-        method: 'get',
-        params: {id}
-      }).then(response => {
+      await listChildren(id).then(response => {
         this.childrenTreeData = response.data
         console.log('节点子节点数据', this.childrenTreeData)
       })
