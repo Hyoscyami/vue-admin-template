@@ -50,7 +50,6 @@
         label="状态"
       >
         <template #default="scope">
-          {{ scope.row.status }}
           <el-switch :model-value="scope.row.status" :active-value="1" :inactive-value="0" />
         </template>
       </el-table-column>
