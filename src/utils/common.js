@@ -15,3 +15,12 @@ export function isEmptyCollection(collection) {
 export function isNotEmptyCollection(collection) {
   return !isEmptyCollection(collection)
 }
+
+/**
+ * 字符串是否为空
+ * @param str
+ * @returns {boolean}
+ */
+export function isBlank(str) {
+  return str === undefined || str.length === 0
+}

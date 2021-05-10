@@ -36,3 +36,11 @@ export function list(data) {
     data
   })
 }
+
+export function listChildren(id) {
+  return request({
+    url: '/dict/listChildren',
+    method: 'get',
+    params: {id}
+  })
+}
