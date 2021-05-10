@@ -67,7 +67,7 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog v-model="addDialogFormVisible" title="新增数据字典">
+    <el-dialog :model-value="addDialogFormVisible" title="新增数据字典">
       <el-form ref="addForm" :model="addForm" :rules="addFormRules" label-width="80px">
         <el-form-item label="码值" prop="code">
           <el-input v-model="addForm.code" autocomplete="off" />
