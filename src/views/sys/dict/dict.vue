@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <el-form ref="formInline" v-model="listQuery" :inline="true">
-        <el-form-item label="字典值" prop="code">
+        <el-form-item label="字典值" prop="code" @keyup.enter.native="searchFormSubmit">
           <el-input v-model="listQuery.code" placeholder="字典值" />
         </el-form-item>
         <el-form-item label="描述" prop="description">
@@ -59,21 +59,21 @@
         width="100"
       >
         <template #default="scope">
-          <el-button type="text" size="small">编辑</el-button>
-          <el-button type="text" size="small" @click="handleClick(scope.row)">查看</el-button>
+          <el-button type="text" size="small" @click="updateDetail(scope.row)">编辑</el-button>
+          <el-button type="text" size="small" @click="viewDetail(scope.row)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog :model-value="addDialogFormVisible" title="新增数据字典">
+    <el-dialog :model-value="addDialogFormVisible" :title="textMap[dialogStatus]" :before-close="cancelAddForm">
       <el-form ref="addForm" :model="addForm" :rules="addFormRules" label-width="80px">
         <el-form-item label="码值" prop="code">
           <el-input v-model="addForm.code" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="addForm.name" autocomplete="off" />
+        <el-form-item label="值" prop="value">
+          <el-input v-model="addForm.value" autocomplete="off" />
         </el-form-item>
         <el-form-item label="描述" prop="description">
           <el-input v-model="addForm.description" autocomplete="off" />
@@ -121,10 +121,16 @@ export default {
       },
       // 新增数据字典弹框
       addDialogFormVisible: false,
+      // 新增或编辑数据字段对话框状态
+      dialogStatus: '',
+      textMap: {
+        update: '编辑',
+        create: '新增'
+      },
       // 新增数据字段表单
       addForm: {
         code: '',
-        name: '',
+        value: '',
         description: '',
         status: 1,
         sort: 1,
@@ -136,8 +142,8 @@ export default {
           { required: true, message: '请输入码值', trigger: 'blur' },
           { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
         ],
-        name: [
-          { required: true, message: '请输入名称', trigger: 'change' }
+        value: [
+          {message: '请输入值', trigger: 'change' }
         ],
         description: [
           { required: true, message: '请输入描述信息', trigger: 'change' }
@@ -158,10 +164,11 @@ export default {
   methods: {
     // 搜索数据字典表单查询
     searchFormSubmit() {
-      console.log('submit!')
+      this.listQuery.page = 1
+      this.getList()
     },
-    handleClick(row) {
-      console.log(row)
+    // 查看详情
+    viewDetail(row) {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
@@ -169,6 +176,7 @@ export default {
     // 打开新增数据字典对话框
     openAddDialog() {
       this.addDialogFormVisible = true
+      this.dialogStatus = 'create'
       this.getMaxSort()
     },
     // 获取当前最大排序值
@@ -191,18 +199,23 @@ export default {
     },
     // 新增数据字典表单取消
     cancelAddForm() {
-      this.resetForm('addForm')
       this.addDialogFormVisible = false
+      this.resetForm('addForm')
     },
     // 获取父数据字段列表数据
     getList() {
       this.listLoading = true
       list(this.listQuery).then(response => {
         this.tableData = response.data.records
-        console.log('tableData', this.tableData)
         this.total = response.data.total
         this.listLoading = false
       })
+    },
+    // 修改数据字典详情
+    updateDetail(row) {
+      this.dialogStatus = 'update'
+      this.addDialogFormVisible = true
+      Object.assign(this.addForm, row)
     }
   }
 }
