@@ -1,17 +1,17 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-form ref="formInline" :inline="true" :model="searchFormInline">
+      <el-form ref="formInline" v-model="listQuery" :inline="true">
         <el-form-item label="字典值" prop="code">
-          <el-input v-model="searchFormInline.code" placeholder="字典值" />
+          <el-input v-model="listQuery.code" placeholder="字典值" />
         </el-form-item>
         <el-form-item label="描述" prop="description">
-          <el-input v-model="searchFormInline.description" placeholder="描述" />
+          <el-input v-model="listQuery.description" placeholder="描述" />
         </el-form-item>
         <el-form-item label="状态" prop="enable">
-          <el-select v-model="searchFormInline.enable" placeholder="状态">
-            <el-option label="启用" value="true" />
-            <el-option label="禁用" value="false" />
+          <el-select v-model="listQuery.status" placeholder="状态">
+            <el-option label="启用" value="1" />
+            <el-option label="禁用" value="0" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -46,11 +46,12 @@
         label="描述"
       />
       <el-table-column
-        prop="enable"
+        prop="status"
         label="状态"
       >
         <template #default="scope">
-          <el-switch v-model="scope.row.enable" />
+          {{ scope.row.status }}
+          <el-switch :model-value="scope.row.status" :active-value="1" :inactive-value="0" />
         </template>
       </el-table-column>
       <el-table-column
@@ -114,13 +115,10 @@ export default {
       listLoading: true,
       listQuery: {
         page: 1,
-        limit: 20
-      },
-      // 查询条件表单
-      searchFormInline: {
+        limit: 20,
         code: '',
         description: '',
-        enable: undefined
+        status: undefined
       },
       // 新增数据字典弹框
       addDialogFormVisible: false,
@@ -169,13 +167,6 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
-    // 格式换数据字典状态
-    enableFormat(row, column) {
-      if (row.enable) {
-        return '已启用'
-      }
-      return '已禁用'
-    },
     // 打开新增数据字典对话框
     openAddDialog() {
       this.addDialogFormVisible = true
@@ -209,8 +200,8 @@ export default {
       this.listLoading = true
       list(this.listQuery).then(response => {
         this.tableData = response.data.records
+        console.log('tableData', this.tableData)
         this.total = response.data.total
-        console.log('total', this.total)
         this.listLoading = false
       })
     }
