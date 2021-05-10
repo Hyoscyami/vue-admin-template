@@ -213,6 +213,12 @@ export default {
       statusSelect: []
     }
   },
+  watch: {
+    // 搜索权限树的时候联动过滤名称符合的树
+    filterText(val) {
+      this.$refs.tree.filter(val)
+    }
+  },
   created() {
     // 初始化状态
     this.listStatus()
