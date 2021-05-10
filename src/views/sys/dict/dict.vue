@@ -27,8 +27,7 @@
             </el-form-item>
             <el-form-item label="状态" prop="enable">
               <el-select v-model="listQuery.status" placeholder="状态">
-                <el-option label="启用" value="1" />
-                <el-option label="禁用" value="0" />
+                <el-option v-for="item in statusSelect" :key="item.id" :label="item.name" :value="item.value" />
               </el-select>
             </el-form-item>
             <el-form-item>
@@ -130,7 +129,7 @@
 </template>
 
 <script>
-import {add, del, getMaxSort, list, listChildren} from '@/api/sys/dict'
+import {add, del, getMaxSort, list, listChildrenByCode, listChildrenById} from '@/api/sys/dict'
 import Pagination from '@/components/Pagination'
 import {isBlank} from '@/utils/common'
 
@@ -209,8 +208,14 @@ export default {
         sort: [
           { required: true, message: '请填写排序值', trigger: 'change' }
         ]
-      }
+      },
+      // 状态选择器
+      statusSelect: []
     }
+  },
+  created() {
+    // 初始化状态
+    this.listStatus()
   },
   methods: {
     // 搜索数据字典表单查询
@@ -294,12 +299,10 @@ export default {
      * @returns {*}
      */
     async loadNode(node, resolve) {
-      console.log('开始加载树，node:', node)
       if (node.level === 0) {
         return resolve([this.rootNode])
       }
       if (node.level > 0) {
-        console.log('获取子节点:', node.data.id)
         await this.getChildrenNode(node.data.id)
         return resolve(this.childrenTreeData)
       }
@@ -319,7 +322,7 @@ export default {
      * @param id 当前节点id
      */
     async getChildrenNode(id) {
-      await listChildren(id).then(response => {
+      await listChildrenById(id).then(response => {
         this.childrenTreeData = response.data
       })
     },
@@ -332,6 +335,12 @@ export default {
         // 刷新表格
         this.getList()
       }
+    },
+    // 获取状态下拉框
+    listStatus() {
+      listChildrenByCode('status').then(response => {
+        this.statusSelect = response.data
+      })
     }
   }
 }

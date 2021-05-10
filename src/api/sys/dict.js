@@ -38,10 +38,18 @@ export function list(data) {
   })
 }
 
-export function listChildren(id) {
+export function listChildrenById(id) {
   return request({
-    url: '/dict/listChildren',
+    url: '/dict/listChildrenById',
     method: 'get',
     params: {id}
+  })
+}
+
+export function listChildrenByCode(code) {
+  return request({
+    url: '/dict/listChildrenByCode',
+    method: 'get',
+    params: {code}
   })
 }

@@ -83,7 +83,7 @@
 
 <script>
 import {validUsername} from '@/utils/validate'
-import request from '@/utils/request'
+import {getCaptcha} from '@/api/user'
 
 export default {
   name: 'Login',
@@ -167,7 +167,7 @@ export default {
       })
     },
     changeVerifyCode() {
-      request({url: '/getCaptcha', method: 'get'}).then(response => {
+      getCaptcha().then(response => {
         this.url = response.data.verifyCodeStr
         this.loginForm.verifyCodeId = response.data.id
       })
