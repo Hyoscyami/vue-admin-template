@@ -11,6 +11,14 @@ export function add(data) {
   })
 }
 
+export function del(id) {
+  return request({
+    url: '/dict/delete',
+    method: 'get',
+    params: {id}
+  })
+}
+
 export function getMaxSort() {
   return request({
     url: '/dict/getMaxSort',

@@ -50,16 +50,24 @@
         label="状态"
       >
         <template #default="scope">
-          <el-switch :model-value="scope.row.status" :active-value="1" :inactive-value="0" />
+          <el-switch :model-value="scope.row.status" :active-value="1" :inactive-value="0" @change="" />
         </template>
       </el-table-column>
       <el-table-column
         fixed="right"
         label="操作"
-        width="100"
+        width="150"
       >
         <template #default="scope">
           <el-button type="text" size="small" @click="updateDetail(scope.row)">编辑</el-button>
+          <el-popconfirm
+            title="这是一段内容确定删除吗？"
+            @confirm="del(scope.row)"
+          >
+            <template #reference>
+              <el-button type="text" size="small">删除</el-button>
+            </template>
+          </el-popconfirm>
           <el-button type="text" size="small" @click="viewDetail(scope.row)">查看</el-button>
         </template>
       </el-table-column>
@@ -100,7 +108,7 @@
 </template>
 
 <script>
-import {add, getMaxSort, list} from '@/api/sys/dict'
+import {add, del, getMaxSort, list} from '@/api/sys/dict'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -216,6 +224,17 @@ export default {
       this.dialogStatus = 'update'
       this.addDialogFormVisible = true
       Object.assign(this.addForm, row)
+    },
+    // 删除数据字典
+    del(row) {
+      del(row.id).then(response => {
+        this.$message({
+          message: '操作成功',
+          type: 'success'
+        })
+        // 刷新表格数据
+        this.searchFormSubmit()
+      })
     }
   }
 }
