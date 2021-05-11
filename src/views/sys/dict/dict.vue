@@ -6,16 +6,23 @@
           v-model="tree.filterTreeText"
           placeholder="输入关键字进行过滤"
         />
-        <el-tree
-          ref="tree"
-          :props="tree.treeProps"
-          node-key="id"
-          :load="loadNode"
-          :expand-on-click-node="false"
-          :filter-node-method="filterNode"
-          lazy
-          @node-click="handleNodeClick"
-        />
+        <div
+          v-infinite-scroll="loadNode"
+          :infinite-scroll-immediate="false"
+          class="tree-box"
+        >
+          <el-tree
+            ref="tree"
+            :props="tree.treeProps"
+            node-key="id"
+            :load="loadNode"
+            :default-expanded-keys="tree.defaultExpandedKeys"
+            :expand-on-click-node="false"
+            :filter-node-method="filterNode"
+            lazy
+            @node-click="handleNodeClick"
+          />
+        </div>
       </el-col>
       <el-col :span="18">
         <div class="filter-container">
@@ -155,10 +162,12 @@ export default {
           parentId: 0,
           isLeaf: false
         },
-        // 被选中节点
+        // 单击被选中节点
         checkedNode: {},
         // 子树的数据
         childrenTreeData: [],
+        // 最开始默认展开的node对应的keys
+        defaultExpandedKeys: [],
         // tree回调函数
         resolveFunc: function() {}
       },
@@ -297,7 +306,7 @@ export default {
     updateDetail(row) {
       this.dialog.dialogStatus = 'update'
       this.dialog.addDialogFormVisible = true
-      Object.assign(this.addForm, row)
+      Object.assign(this.dialog.addForm, row)
     },
     // 删除数据字典
     del(row) {
@@ -362,7 +371,9 @@ export default {
     },
     // 更新状态
     updateStatus(data) {
-      console.log('data:', data)
+      if (!data.id) {
+        return
+      }
       const param = {}
       Object.assign(param, data)
       if (param.status === 1) {
@@ -376,6 +387,7 @@ export default {
           message: '操作成功',
           type: 'success'
         })
+        data.status = param.status
       })
     }
   }
@@ -383,5 +395,8 @@ export default {
 </script>
 
 <style scoped>
-
+.tree-box {
+  height: 50px;
+  overflow: auto;
+}
 </style>
