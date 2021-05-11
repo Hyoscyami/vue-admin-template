@@ -19,16 +19,16 @@
       </el-col>
       <el-col :span="18">
         <div class="filter-container">
-          <el-form ref="formInline" v-model="listQuery" :inline="true">
+          <el-form ref="formInline" v-model="table.listQuery" :inline="true">
             <el-form-item label="字典值" prop="code" @keyup.enter.native="searchFormSubmit">
-              <el-input v-model="listQuery.code" placeholder="字典值" />
+              <el-input v-model="table.listQuery.code" placeholder="字典值" />
             </el-form-item>
             <el-form-item label="描述" prop="description">
-              <el-input v-model="listQuery.description" placeholder="描述" />
+              <el-input v-model="table.listQuery.description" placeholder="描述" />
             </el-form-item>
             <el-form-item label="状态" prop="enable">
-              <el-select v-model="listQuery.status" placeholder="状态">
-                <el-option v-for="item in statusSelect" :key="item.id" :label="item.name" :value="item.value" />
+              <el-select v-model="table.listQuery.status" placeholder="状态">
+                <el-option v-for="item in table.statusSelect" :key="item.id" :label="item.name" :value="item.value" />
               </el-select>
             </el-form-item>
             <el-form-item>
@@ -41,7 +41,7 @@
           </el-button>
         </div>
         <el-table
-          :data="tableData"
+          :data="table.tableData"
           style="width: 100%"
         >
           <el-table-column
@@ -90,7 +90,7 @@
           </el-table-column>
         </el-table>
 
-        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+        <pagination v-show="table.total>0" :total="table.total" :page.sync="table.listQuery.page" :limit.sync="table.listQuery.limit" @pagination="getList" />
 
         <el-dialog :model-value="dialog.addDialogFormVisible" :title="dialog.textMap[dialog.dialogStatus]" :before-close="cancelAddForm">
           <el-form ref="addForm" :model="dialog.addForm" :rules="dialog.addFormRules" label-width="80px">
@@ -162,17 +162,22 @@ export default {
         // tree回调函数
         resolveFunc: function() {}
       },
-      // 父数据字段表格数据
-      tableData: [],
-      total: 0,
-      listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 20,
-        parentId: '',
-        code: '',
-        description: '',
-        status: undefined
+      // 表格
+      table: {
+        // 父数据字段表格数据
+        tableData: [],
+        total: 0,
+        listLoading: true,
+        listQuery: {
+          page: 1,
+          limit: 20,
+          parentId: '',
+          code: '',
+          description: '',
+          status: undefined
+        },
+        // 状态选择器
+        statusSelect: []
       },
       // 对话框
       dialog: {
@@ -217,9 +222,7 @@ export default {
             { required: true, message: '请填写排序值', trigger: 'change' }
           ]
         }
-      },
-      // 状态选择器
-      statusSelect: []
+      }
     }
   },
   watch: {
@@ -235,7 +238,7 @@ export default {
   methods: {
     // 搜索数据字典表单查询
     searchFormSubmit() {
-      this.listQuery.page = 1
+      this.table.listQuery.page = 1
       this.getList()
     },
     // 查看详情
@@ -283,11 +286,11 @@ export default {
     },
     // 获取父数据字段列表数据
     getList() {
-      this.listLoading = true
-      list(this.listQuery).then(response => {
-        this.tableData = response.data.records
-        this.total = response.data.total
-        this.listLoading = false
+      this.table.listLoading = true
+      list(this.table.listQuery).then(response => {
+        this.table.tableData = response.data.records
+        this.table.total = response.data.total
+        this.table.listLoading = false
       })
     },
     // 修改数据字典详情
@@ -346,7 +349,7 @@ export default {
       // 保存被选择节点
       Object.assign(this.tree.checkedNode, data)
       if (data.id !== 0) {
-        this.listQuery.parentId = data.id
+        this.table.listQuery.parentId = data.id
         // 刷新表格
         this.getList()
       }
@@ -354,7 +357,7 @@ export default {
     // 获取状态下拉框
     listStatus() {
       listChildrenByCode('status').then(response => {
-        this.statusSelect = response.data
+        this.table.statusSelect = response.data
       })
     }
   }
