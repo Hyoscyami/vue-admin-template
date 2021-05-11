@@ -3,14 +3,15 @@
     <el-row :gutter="20">
       <el-col :span="6">
         <el-input
-          v-model="filterTreeText"
+          v-model="tree.filterTreeText"
           placeholder="输入关键字进行过滤"
         />
         <el-tree
           ref="tree"
-          :props="treeProps"
+          :props="tree.treeProps"
           node-key="id"
           :load="loadNode"
+          :expand-on-click-node="false"
           :filter-node-method="filterNode"
           lazy
           @node-click="handleNodeClick"
@@ -91,27 +92,27 @@
 
         <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-        <el-dialog :model-value="addDialogFormVisible" :title="textMap[dialogStatus]" :before-close="cancelAddForm">
-          <el-form ref="addForm" :model="addForm" :rules="addFormRules" label-width="80px">
+        <el-dialog :model-value="dialog.addDialogFormVisible" :title="dialog.textMap[dialog.dialogStatus]" :before-close="cancelAddForm">
+          <el-form ref="addForm" :model="dialog.addForm" :rules="dialog.addFormRules" label-width="80px">
             <el-form-item label="码值" prop="code">
-              <el-input v-model="addForm.code" autocomplete="off" />
+              <el-input v-model="dialog.addForm.code" autocomplete="off" />
             </el-form-item>
             <el-form-item label="字典名称" prop="name">
-              <el-input v-model="addForm.name" autocomplete="off" />
+              <el-input v-model="dialog.addForm.name" autocomplete="off" />
             </el-form-item>
             <el-form-item label="值" prop="value">
-              <el-input v-model="addForm.value" autocomplete="off" />
+              <el-input v-model="dialog.addForm.value" autocomplete="off" />
             </el-form-item>
             <el-form-item label="描述" prop="description">
-              <el-input v-model="addForm.description" autocomplete="off" />
+              <el-input v-model="dialog.addForm.description" autocomplete="off" />
             </el-form-item>
             <el-form-item label="排序值" prop="sort">
-              <el-input v-model="addForm.sort" autocomplete="off" />
+              <el-input v-model="dialog.addForm.sort" autocomplete="off" />
             </el-form-item>
             <el-form-item label="状态" prop="status">
-              <el-radio-group v-model="addForm.status">
-                <el-radio v-model="addForm.status" :label="1">启用</el-radio>
-                <el-radio v-model="addForm.status" :label="0">禁用</el-radio>
+              <el-radio-group v-model="dialog.addForm.status">
+                <el-radio v-model="dialog.addForm.status" :label="1">启用</el-radio>
+                <el-radio v-model="dialog.addForm.status" :label="0">禁用</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-form>
@@ -138,24 +139,29 @@ export default {
   components: { Pagination },
   data() {
     return {
-      // 过滤树的字段
-      filterTreeText: '',
-      // 树的属性重命名
-      treeProps: {
-        label: 'name',
-        isLeaf: 'isLeaf'
+      // 树相关
+      tree: {
+        // 过滤树的字段
+        filterTreeText: '',
+        // 树的属性重命名
+        treeProps: {
+          label: 'name',
+          isLeaf: 'isLeaf'
+        },
+        // 根节点
+        rootNode: {
+          id: 0,
+          name: '数据字典',
+          parentId: 0,
+          isLeaf: false
+        },
+        // 被选中节点
+        checkedNode: {},
+        // 子树的数据
+        childrenTreeData: [],
+        // tree回调函数
+        resolveFunc: function() {}
       },
-      // 根节点
-      rootNode: {
-        id: 0,
-        name: '数据字典',
-        parentId: 0,
-        isLeaf: false
-      },
-      // 被选中节点
-      checkedNode: {},
-      // 子树的数据
-      childrenTreeData: [],
       // 父数据字段表格数据
       tableData: [],
       total: 0,
@@ -168,46 +174,49 @@ export default {
         description: '',
         status: undefined
       },
-      // 新增数据字典弹框
-      addDialogFormVisible: false,
-      // 新增或编辑数据字段对话框状态
-      dialogStatus: '',
-      // 新增或编辑数据字典弹框
-      textMap: {
-        update: '编辑',
-        create: '新增'
-      },
-      // 新增数据字段表单
-      addForm: {
-        code: '',
-        name: '',
-        value: '',
-        description: '',
-        status: 1,
-        sort: 1,
-        parentId: 0
-      },
-      // 新增数据字典规则
-      addFormRules: {
-        code: [
-          { required: true, message: '请输入码值', trigger: 'blur' },
-          { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
-        ],
-        name: [
-          { required: true, message: '请输入字典名称', trigger: 'change' }
-        ],
-        value: [
-          { required: true, message: '请输入值', trigger: 'change' }
-        ],
-        description: [
-          { message: '请输入描述信息', trigger: 'change' }
-        ],
-        status: [
-          { required: true, message: '请选择状态', trigger: 'change' }
-        ],
-        sort: [
-          { required: true, message: '请填写排序值', trigger: 'change' }
-        ]
+      // 对话框
+      dialog: {
+        // 新增数据字典弹框
+        addDialogFormVisible: false,
+        // 新增或编辑数据字段对话框状态
+        dialogStatus: '',
+        // 新增或编辑数据字典弹框
+        textMap: {
+          update: '编辑',
+          create: '新增'
+        },
+        // 新增数据字段表单
+        addForm: {
+          code: '',
+          name: '',
+          value: '',
+          description: '',
+          status: 1,
+          sort: 1,
+          parentId: 0
+        },
+        // 新增数据字典规则
+        addFormRules: {
+          code: [
+            { required: true, message: '请输入码值', trigger: 'blur' },
+            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
+          ],
+          name: [
+            { required: true, message: '请输入字典名称', trigger: 'change' }
+          ],
+          value: [
+            { required: true, message: '请输入值', trigger: 'change' }
+          ],
+          description: [
+            { message: '请输入描述信息', trigger: 'change' }
+          ],
+          status: [
+            { required: true, message: '请选择状态', trigger: 'change' }
+          ],
+          sort: [
+            { required: true, message: '请填写排序值', trigger: 'change' }
+          ]
+        }
       },
       // 状态选择器
       statusSelect: []
@@ -244,22 +253,22 @@ export default {
         })
         return false
       }
-      this.addDialogFormVisible = true
-      this.dialogStatus = 'create'
-      this.getMaxSort(this.checkedNode.id)
-      this.addForm.parentId = this.checkedNode.id
+      this.dialog.addDialogFormVisible = true
+      this.dialog.dialogStatus = 'create'
+      this.getMaxSort(this.tree.checkedNode.id)
+      this.dialog.addForm.parentId = this.checkedNode.id
     },
     // 获取当前最大排序值
     getMaxSort(id) {
       getMaxSort(id).then(response => {
-        this.addForm.sort = response.data
+        this.dialog.addForm.sort = response.data
       })
     },
     // 新增数据字典表单提交
     addFormSubmit() {
       this.$refs['addForm'].validate((valid) => {
         if (valid) {
-          add(JSON.stringify(this.addForm)).then(response => {
+          add(JSON.stringify(this.dialog.addForm)).then(response => {
             this.cancelAddForm()
           })
         } else {
@@ -269,7 +278,7 @@ export default {
     },
     // 新增数据字典表单取消
     cancelAddForm() {
-      this.addDialogFormVisible = false
+      this.dialog.addDialogFormVisible = false
       this.resetForm('addForm')
     },
     // 获取父数据字段列表数据
@@ -283,8 +292,8 @@ export default {
     },
     // 修改数据字典详情
     updateDetail(row) {
-      this.dialogStatus = 'update'
-      this.addDialogFormVisible = true
+      this.dialog.dialogStatus = 'update'
+      this.dialog.addDialogFormVisible = true
       Object.assign(this.addForm, row)
     },
     // 删除数据字典
@@ -306,11 +315,11 @@ export default {
      */
     async loadNode(node, resolve) {
       if (node.level === 0) {
-        return resolve([this.rootNode])
+        return resolve([this.tree.rootNode])
       }
       if (node.level > 0) {
         await this.getChildrenNode(node.data.id)
-        return resolve(this.childrenTreeData)
+        return resolve(this.tree.childrenTreeData)
       }
     },
     /**
@@ -329,13 +338,13 @@ export default {
      */
     async getChildrenNode(id) {
       await listChildrenById(id).then(response => {
-        this.childrenTreeData = response.data
+        this.tree.childrenTreeData = response.data
       })
     },
     // 节点被点击
     handleNodeClick(data) {
       // 保存被选择节点
-      Object.assign(this.checkedNode, data)
+      Object.assign(this.tree.checkedNode, data)
       if (data.id !== 0) {
         this.listQuery.parentId = data.id
         // 刷新表格
