@@ -53,3 +53,14 @@ export function listChildrenByCode(code) {
     params: {code}
   })
 }
+
+export function update(data) {
+  return request({
+    url: '/dict/update',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    },
+    data
+  })
+}

@@ -67,7 +67,7 @@
             label="状态"
           >
             <template #default="scope">
-              <el-switch :model-value="scope.row.status" :active-value="1" :inactive-value="0" @change="" />
+              <el-switch :model-value="scope.row.status" :active-value="1" :inactive-value="0" @change="updateStatus(scope.row)" />
             </template>
           </el-table-column>
           <el-table-column
@@ -130,7 +130,7 @@
 </template>
 
 <script>
-import {add, del, getMaxSort, list, listChildrenByCode, listChildrenById} from '@/api/sys/dict'
+import {add, del, getMaxSort, list, listChildrenByCode, listChildrenById, update} from '@/api/sys/dict'
 import Pagination from '@/components/Pagination'
 import {isBlank} from '@/utils/common'
 
@@ -358,6 +358,24 @@ export default {
     listStatus() {
       listChildrenByCode('status').then(response => {
         this.table.statusSelect = response.data
+      })
+    },
+    // 更新状态
+    updateStatus(data) {
+      console.log('data:', data)
+      const param = {}
+      Object.assign(param, data)
+      if (param.status === 1) {
+        param.status = 0
+      } else {
+        param.status = 1
+      }
+      console.log('param:', param)
+      update(param).then(response => {
+        this.$message({
+          message: '操作成功',
+          type: 'success'
+        })
       })
     }
   }
