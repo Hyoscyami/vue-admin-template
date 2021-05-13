@@ -7,7 +7,7 @@
           placeholder="输入关键字进行过滤"
         />
         <div
-          v-infinite-scroll="loadNode"
+          v-infinite-scroll="scrollTreeData"
           :infinite-scroll-immediate="false"
           class="tree-box"
         >
@@ -139,7 +139,7 @@
 <script>
 import {add, del, getMaxSort, list, listChildrenByCode, listChildrenById, update} from '@/api/sys/dict'
 import Pagination from '@/components/Pagination'
-import {isBlank} from '@/utils/common'
+import {isBlank, isNotEmptyCollection} from '@/utils/common'
 
 export default {
   name: 'Dict',
@@ -168,8 +168,19 @@ export default {
         childrenTreeData: [],
         // 最开始默认展开的node对应的keys
         defaultExpandedKeys: [],
-        // tree回调函数
-        resolveFunc: function() {}
+        // tree分页查询对象
+        listQuery: {
+          page: 1,
+          limit: 20,
+          parentId: '',
+          code: '',
+          description: '',
+          status: undefined
+        },
+        // 树查询结果返回节点的总数
+        total: 0,
+        // 是否能下拉加载数据
+        canScrollTree: false
       },
       // 表格
       table: {
@@ -240,6 +251,11 @@ export default {
       this.$refs.tree.filter(val)
     }
   },
+  computed:{
+    canScrollTree:function (){
+
+    }
+  }
   created() {
     // 初始化状态
     this.listStatus()
@@ -327,12 +343,33 @@ export default {
      */
     async loadNode(node, resolve) {
       if (node.level === 0) {
+        // 最开始的时候，默认根节点被选中
+        Object.assign(this.tree.checkedNode, node)
+        console.log('根节点加载，this.tree.checkedNode', this.tree.checkedNode)
         return resolve([this.tree.rootNode])
       }
       if (node.level > 0) {
         await this.getChildrenNode(node.data.id)
+        this.tree.checkedNode = node
         return resolve(this.tree.childrenTreeData)
       }
+    },
+    // 滚动下拉树的数据
+    scrollTreeData() {
+      this.tree.listQuery.page = this.tree.listQuery.page + 1
+      this.tree.listQuery.parentId = this.tree.checkedNode.id
+      list(this.tree.listQuery).then(response => {
+        if (isNotEmptyCollection(response.data.records)) {
+          // 追加树节点
+          response.data.records.forEach(node => {
+            this.$refs['tree'].append(node, this.tree.checkedNode)
+          })
+          // 大于，则之后无数据，无需继续滚动加载
+          if (this.tree.listQuery.page * this.tree.listQuery.limit > response.data.total) {
+
+          }
+        }
+      })
     },
     /**
      * 过滤tree的节点

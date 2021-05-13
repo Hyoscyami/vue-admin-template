@@ -136,7 +136,7 @@ export default {
       immediate: true
     }
   },
-  mounted() {
+  created() {
     // 验证码初始化
     this.changeVerifyCode()
   },
