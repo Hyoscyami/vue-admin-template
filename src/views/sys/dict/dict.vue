@@ -20,6 +20,7 @@
             :default-expanded-keys="tree.defaultExpandedKeys"
             :expand-on-click-node="false"
             :filter-node-method="filterNode"
+            :highlight-current="true"
             lazy
             @node-click="handleNodeClick"
             @node-expand="handleNodeExpand"
@@ -278,6 +279,8 @@ export default {
   created() {
     // 初始化状态
     this.listStatus()
+    // 初始化表格
+    this.searchFormSubmit()
   },
   methods: {
     // 搜索数据字典表单查询
@@ -381,6 +384,7 @@ export default {
       this.tree.listQuery.parentId = this.tree.checkedNodeDropdown.data.id
       list(this.tree.listQuery).then(response => {
         this.tree.total = response.data.total
+        // 数据不为空，且滚动框未禁用
         if (isNotEmptyCollection(response.data.records) && !this.tree.scrollTreeDisable) {
           // 追加树节点
           response.data.records.forEach(node => {
@@ -424,13 +428,11 @@ export default {
     handleNodeExpand(data) {
       // 保存被选择节点
       Object.assign(this.tree.checkedNodeDropdown, data)
-      console.log('节点被展开,this.tree.checkedNodeDropdown:', this.tree.checkedNodeDropdown)
     },
     // 节点被关闭
     handleNodeCollapse(data) {
-      // 保存被选择节点
+      // 保存被选择节点，此时传当前被关闭的节点的父节点，因为当前节点被关闭，有下拉分页的需求最多是当前节点的父节点
       Object.assign(this.tree.checkedNodeDropdown, data.parent)
-      console.log('节点被关闭,this.tree.checkedNodeDropdown:', this.tree.checkedNodeDropdown)
     },
     // 获取状态下拉框
     listStatus() {
@@ -465,7 +467,7 @@ export default {
 
 <style scoped>
 .tree-box {
-  height: 50px;
+  height: 800px;
   overflow: auto;
 }
 </style>
