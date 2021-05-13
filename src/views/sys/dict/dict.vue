@@ -158,13 +158,36 @@
           :before-close="cancelView"
         >
           <el-descriptions title="字典">
-            <el-descriptions-item label="用户名">kooriookami</el-descriptions-item>
-            <el-descriptions-item label="手机号">18100000000</el-descriptions-item>
-            <el-descriptions-item label="居住地">苏州市</el-descriptions-item>
-            <el-descriptions-item label="备注">
-              <el-tag size="small">学校</el-tag>
+            <el-descriptions-item label="码值">
+              <el-tag size="small">{{ dialog.viewDetailData.code }}</el-tag>
             </el-descriptions-item>
-            <el-descriptions-item label="联系地址">江苏省苏州市吴中区吴中大道 1188 号</el-descriptions-item>
+            <el-descriptions-item label="名称">
+              <el-tag size="small">{{ dialog.viewDetailData.name }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="值">
+              <el-tag size="small">{{ dialog.viewDetailData.value }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="描述">
+              <el-tag size="small">{{ dialog.viewDetailData.description }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="状态">
+              <el-tag size="small">{{ viewDetailDataStatus }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="排序值">
+              <el-tag size="small">{{ dialog.viewDetailData.sort }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="创建时间">
+              <el-tag size="small">{{ viewDetailDataCreateTime }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="创建人">
+              <el-tag size="small">{{ dialog.viewDetailData.creatorName }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="修改时间">
+              <el-tag size="small">{{ dialog.viewDetailData.modifyTime }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="修改人">
+              <el-tag size="small">{{ dialog.viewDetailData.modifierName }}</el-tag>
+            </el-descriptions-item>
           </el-descriptions>
           <template #footer>
             <span class="dialog-footer">
@@ -181,7 +204,8 @@
 <script>
 import {add, del, getMaxSort, list, listChildrenByCode, update} from '@/api/sys/dict'
 import Pagination from '@/components/Pagination'
-import {isBlank, isNotEmptyCollection} from '@/utils/common'
+import {dictConvert, isBlank, isNotEmptyCollection} from '@/utils/common'
+import {format} from '@/utils/time'
 
 export default {
   name: 'Dict',
@@ -250,7 +274,18 @@ export default {
         // 查看详情对话框
         viewDialogVisible: false,
         // 查看详情的数据
-        viewDetailData: {},
+        viewDetailData: {
+          code: '',
+          name: '',
+          value: '',
+          description: '',
+          status: undefined,
+          sort: 1,
+          createTime: '',
+          creatorName: '',
+          modifyTime: '',
+          modifierName: ''
+        },
         // 新增或编辑数据字段对话框状态
         dialogStatus: '',
         // 新增或编辑数据字典弹框
@@ -293,15 +328,16 @@ export default {
       }
     }
   },
-  // computed: {
-  //   // 树是否能下拉加载
-  //   canScrollTree: function() {
-  //     if (this.tree.listQuery.page * this.tree.listQuery.limit > this.tree.total) {
-  //       return false
-  //     }
-  //     return true
-  //   }
-  // },
+  computed: {
+    // 状态转换
+    viewDetailDataStatus: function() {
+      return dictConvert('status', this.dialog.viewDetailData.value)
+    },
+    // 日期转换
+    viewDetailDataCreateTime: function() {
+      return format(this.dialog.viewDetailData.createTime)
+    }
+  },
   watch: {
     // 搜索权限树的时候联动过滤名称符合的树
     'tree.filterTreeText'(val) {

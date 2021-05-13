@@ -43,7 +43,6 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    console.log('response:', response)
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.
@@ -75,7 +74,7 @@ service.interceptors.response.use(
   error => {
     console.log('err' + error) // for debug
     if (error.response.status === 401) {
-      ElMessageBox.confirm('您已退出登录，是否重新登录', '确定退出', {
+      ElMessageBox.confirm('您登录已过期，是否重新登录', '确定退出', {
         confirmButtonText: '重新登录',
         cancelButtonText: '取消',
         type: 'warning'

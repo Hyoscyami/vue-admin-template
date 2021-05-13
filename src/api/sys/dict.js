@@ -64,3 +64,11 @@ export function update(data) {
     data
   })
 }
+
+export function getDetailByCode(code) {
+  return request({
+    url: '/dict/getDetailByCode',
+    method: 'get',
+    params: {code}
+  })
+}
