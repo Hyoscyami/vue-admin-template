@@ -8,6 +8,7 @@
         />
         <div
           v-infinite-scroll="scrollTreeData"
+          :infinite-scroll-disabled="tree.scrollTreeDisable"
           :infinite-scroll-immediate="false"
           class="tree-box"
         >
@@ -21,6 +22,8 @@
             :filter-node-method="filterNode"
             lazy
             @node-click="handleNodeClick"
+            @node-expand="handleNodeExpand"
+            @node-collapse="handleNodeCollapse"
           />
         </div>
       </el-col>
@@ -162,8 +165,10 @@ export default {
           parentId: 0,
           isLeaf: false
         },
-        // 单击被选中节点
-        checkedNode: {},
+        // 单击被选中节点，给右侧表格列表查询使用
+        checkedNodeClick: {},
+        // 点击下拉图标选中的节点，给树使用
+        checkedNodeDropdown: {},
         // 子树的数据
         childrenTreeData: [],
         // 最开始默认展开的node对应的keys
@@ -180,7 +185,7 @@ export default {
         // 树查询结果返回节点的总数
         total: 0,
         // 是否能下拉加载数据
-        canScrollTree: false
+        scrollTreeDisable: false
       },
       // 表格
       table: {
@@ -245,17 +250,31 @@ export default {
       }
     }
   },
+  // computed: {
+  //   // 树是否能下拉加载
+  //   canScrollTree: function() {
+  //     if (this.tree.listQuery.page * this.tree.listQuery.limit > this.tree.total) {
+  //       return false
+  //     }
+  //     return true
+  //   }
+  // },
   watch: {
     // 搜索权限树的时候联动过滤名称符合的树
-    filterText(val) {
+    'tree.filterTreeText'(val) {
       this.$refs.tree.filter(val)
+    },
+    // total改变了 ，计算是否能继续滚动加载树
+    'tree.total'(val) {
+      // 小于总数，启用滚动
+      if (this.tree.listQuery.page * this.tree.listQuery.limit < this.tree.total) {
+        this.tree.scrollTreeDisable = false
+      } else {
+        this.tree.scrollTreeDisable = true
+      }
+      console.log('监听到total改变，scrollTreeDisable', this.tree.scrollTreeDisable)
     }
   },
-  computed:{
-    canScrollTree:function (){
-
-    }
-  }
   created() {
     // 初始化状态
     this.listStatus()
@@ -283,8 +302,8 @@ export default {
       }
       this.dialog.addDialogFormVisible = true
       this.dialog.dialogStatus = 'create'
-      this.getMaxSort(this.tree.checkedNode.id)
-      this.dialog.addForm.parentId = this.checkedNode.id
+      this.getMaxSort(this.tree.checkedNodeClick.id)
+      this.dialog.addForm.parentId = this.tree.checkedNodeClick.id
     },
     // 获取当前最大排序值
     getMaxSort(id) {
@@ -342,32 +361,31 @@ export default {
      * @returns {*}
      */
     async loadNode(node, resolve) {
+      Object.assign(this.tree.checkedNodeDropdown, node)
       if (node.level === 0) {
         // 最开始的时候，默认根节点被选中
-        Object.assign(this.tree.checkedNode, node)
-        console.log('根节点加载，this.tree.checkedNode', this.tree.checkedNode)
+        console.log('node.level===0,node:', node)
+        console.log('根节点加载，this.tree.checkedNode', this.tree.checkedNodeDropdown)
         return resolve([this.tree.rootNode])
       }
       if (node.level > 0) {
         await this.getChildrenNode(node.data.id)
-        this.tree.checkedNode = node
+        console.log('node.level>0,node:', node)
         return resolve(this.tree.childrenTreeData)
       }
     },
     // 滚动下拉树的数据
     scrollTreeData() {
+      console.log('下拉加载,this.tree', this.tree)
       this.tree.listQuery.page = this.tree.listQuery.page + 1
-      this.tree.listQuery.parentId = this.tree.checkedNode.id
+      this.tree.listQuery.parentId = this.tree.checkedNodeDropdown.data.id
       list(this.tree.listQuery).then(response => {
-        if (isNotEmptyCollection(response.data.records)) {
+        this.tree.total = response.data.total
+        if (isNotEmptyCollection(response.data.records) && !this.tree.scrollTreeDisable) {
           // 追加树节点
           response.data.records.forEach(node => {
-            this.$refs['tree'].append(node, this.tree.checkedNode)
+            this.$refs['tree'].append(node, this.tree.checkedNodeDropdown)
           })
-          // 大于，则之后无数据，无需继续滚动加载
-          if (this.tree.listQuery.page * this.tree.listQuery.limit > response.data.total) {
-
-          }
         }
       })
     },
@@ -386,19 +404,33 @@ export default {
      * @param id 当前节点id
      */
     async getChildrenNode(id) {
-      await listChildrenById(id).then(response => {
-        this.tree.childrenTreeData = response.data
+      this.tree.listQuery.parentId = id
+      await list(this.tree.listQuery).then(response => {
+        this.tree.childrenTreeData = response.data.records
+        this.tree.total = response.data.total
       })
     },
     // 节点被点击
     handleNodeClick(data) {
       // 保存被选择节点
-      Object.assign(this.tree.checkedNode, data)
+      Object.assign(this.tree.checkedNodeClick, data)
       if (data.id !== 0) {
         this.table.listQuery.parentId = data.id
         // 刷新表格
         this.getList()
       }
+    },
+    // 节点被展开
+    handleNodeExpand(data) {
+      // 保存被选择节点
+      Object.assign(this.tree.checkedNodeDropdown, data)
+      console.log('节点被展开,this.tree.checkedNodeDropdown:', this.tree.checkedNodeDropdown)
+    },
+    // 节点被关闭
+    handleNodeCollapse(data) {
+      // 保存被选择节点
+      Object.assign(this.tree.checkedNodeDropdown, data.parent)
+      console.log('节点被关闭,this.tree.checkedNodeDropdown:', this.tree.checkedNodeDropdown)
     },
     // 获取状态下拉框
     listStatus() {

@@ -127,7 +127,7 @@ export default {
   },
   watch: {
     // 搜索权限树的时候联动过滤名称符合的树
-    filterText(val) {
+    filterTreeText(val) {
       this.$refs.tree.filter(val)
     }
   },
