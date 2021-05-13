@@ -62,12 +62,14 @@
           <el-table-column
             prop="code"
             label="码值"
-            width="180"
+          />
+          <el-table-column
+            prop="name"
+            label="名称"
           />
           <el-table-column
             prop="value"
             label="值"
-            width="180"
           />
           <el-table-column
             prop="description"
@@ -78,7 +80,12 @@
             label="状态"
           >
             <template #default="scope">
-              <el-switch :model-value="scope.row.status" :active-value="1" :inactive-value="0" @change="updateStatus(scope.row)" />
+              <el-switch
+                :model-value="scope.row.status"
+                :active-value="1"
+                :inactive-value="0"
+                @change="updateStatus(scope.row)"
+              />
             </template>
           </el-table-column>
           <el-table-column
@@ -101,9 +108,19 @@
           </el-table-column>
         </el-table>
 
-        <pagination v-show="table.total>0" :total="table.total" :page.sync="table.listQuery.page" :limit.sync="table.listQuery.limit" @pagination="getList" />
-
-        <el-dialog :model-value="dialog.addDialogFormVisible" :title="dialog.textMap[dialog.dialogStatus]" :before-close="cancelAddForm">
+        <pagination
+          v-show="table.total>0"
+          :total="table.total"
+          :page.sync="table.listQuery.page"
+          :limit.sync="table.listQuery.limit"
+          @pagination="getList"
+        />
+        <!--新增或编辑弹框-->
+        <el-dialog
+          :model-value="dialog.addDialogFormVisible"
+          :title="dialog.textMap[dialog.dialogStatus]"
+          :before-close="cancelAddForm"
+        >
           <el-form ref="addForm" :model="dialog.addForm" :rules="dialog.addFormRules" label-width="80px">
             <el-form-item label="码值" prop="code">
               <el-input v-model="dialog.addForm.code" autocomplete="off" />
@@ -134,6 +151,27 @@
             </span>
           </template>
         </el-dialog>
+        <!--查看详情弹框-->
+        <el-dialog
+          :model-value="dialog.viewDialogVisible"
+          title="详情"
+          :before-close="cancelView"
+        >
+          <el-descriptions title="字典">
+            <el-descriptions-item label="用户名">kooriookami</el-descriptions-item>
+            <el-descriptions-item label="手机号">18100000000</el-descriptions-item>
+            <el-descriptions-item label="居住地">苏州市</el-descriptions-item>
+            <el-descriptions-item label="备注">
+              <el-tag size="small">学校</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="联系地址">江苏省苏州市吴中区吴中大道 1188 号</el-descriptions-item>
+          </el-descriptions>
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="cancelView">关闭</el-button>
+            </span>
+          </template>
+        </el-dialog>
       </el-col>
 
     </el-row>
@@ -141,13 +179,13 @@
 </template>
 
 <script>
-import {add, del, getMaxSort, list, listChildrenByCode, listChildrenById, update} from '@/api/sys/dict'
+import {add, del, getMaxSort, list, listChildrenByCode, update} from '@/api/sys/dict'
 import Pagination from '@/components/Pagination'
 import {isBlank, isNotEmptyCollection} from '@/utils/common'
 
 export default {
   name: 'Dict',
-  components: { Pagination },
+  components: {Pagination},
   data() {
     return {
       // 树相关
@@ -209,6 +247,10 @@ export default {
       dialog: {
         // 新增数据字典弹框
         addDialogFormVisible: false,
+        // 查看详情对话框
+        viewDialogVisible: false,
+        // 查看详情的数据
+        viewDetailData: {},
         // 新增或编辑数据字段对话框状态
         dialogStatus: '',
         // 新增或编辑数据字典弹框
@@ -229,23 +271,23 @@ export default {
         // 新增数据字典规则
         addFormRules: {
           code: [
-            { required: true, message: '请输入码值', trigger: 'blur' },
-            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
+            {required: true, message: '请输入码值', trigger: 'blur'},
+            {min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur'}
           ],
           name: [
-            { required: true, message: '请输入字典名称', trigger: 'change' }
+            {required: true, message: '请输入字典名称', trigger: 'change'}
           ],
           value: [
-            { required: true, message: '请输入值', trigger: 'change' }
+            {required: true, message: '请输入值', trigger: 'change'}
           ],
           description: [
-            { message: '请输入描述信息', trigger: 'change' }
+            {message: '请输入描述信息', trigger: 'change'}
           ],
           status: [
-            { required: true, message: '请选择状态', trigger: 'change' }
+            {required: true, message: '请选择状态', trigger: 'change'}
           ],
           sort: [
-            { required: true, message: '请填写排序值', trigger: 'change' }
+            {required: true, message: '请填写排序值', trigger: 'change'}
           ]
         }
       }
@@ -290,6 +332,8 @@ export default {
     },
     // 查看详情
     viewDetail(row) {
+      this.dialog.viewDialogVisible = true
+      Object.assign(this.dialog.viewDetailData, row)
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
@@ -330,6 +374,10 @@ export default {
     cancelAddForm() {
       this.dialog.addDialogFormVisible = false
       this.resetForm('addForm')
+    },
+    // 查看详情字典弹框取消
+    cancelView() {
+      this.dialog.viewDialogVisible = false
     },
     // 获取父数据字段列表数据
     getList() {
