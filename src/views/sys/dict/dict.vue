@@ -52,6 +52,7 @@
           </el-button>
         </div>
         <el-table
+          v-loading="table.listLoading"
           :data="table.tableData"
           style="width: 100%"
         >
@@ -331,7 +332,7 @@ export default {
   computed: {
     // 状态转换
     viewDetailDataStatus: function() {
-      return dictConvert('status', this.dialog.viewDetailData.value)
+      return dictConvert('status', this.dialog.viewDetailData.status)
     },
     // 日期转换
     viewDetailDataCreateTime: function() {
@@ -346,11 +347,7 @@ export default {
     // total改变了 ，计算是否能继续滚动加载树
     'tree.total'(val) {
       // 小于总数，启用滚动
-      if (this.tree.listQuery.page * this.tree.listQuery.limit < this.tree.total) {
-        this.tree.scrollTreeDisable = false
-      } else {
-        this.tree.scrollTreeDisable = true
-      }
+      this.tree.scrollTreeDisable = this.tree.listQuery.page * this.tree.listQuery.limit >= this.tree.total
       console.log('监听到total改变，scrollTreeDisable', this.tree.scrollTreeDisable)
     }
   },
