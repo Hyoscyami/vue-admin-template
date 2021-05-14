@@ -499,11 +499,9 @@ export default {
     handleNodeClick(data) {
       // 保存被选择节点
       Object.assign(this.tree.checkedNodeClick, data)
-      if (data.id !== 0) {
-        this.table.listQuery.parentId = data.id
-        // 刷新表格
-        this.getList()
-      }
+      this.table.listQuery.parentId = data.id
+      // 刷新表格
+      this.getList()
     },
     // 节点被展开
     handleNodeExpand(data) {
