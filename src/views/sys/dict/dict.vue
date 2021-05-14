@@ -373,7 +373,7 @@ export default {
     },
     // 打开新增数据字典对话框
     openAddDialog() {
-      if (isBlank(this.checkedNode.id)) {
+      if (isBlank(this.tree.checkedNodeClick.id)) {
         this.$message({
           message: '请先在左侧选择节点',
           type: 'warning'
