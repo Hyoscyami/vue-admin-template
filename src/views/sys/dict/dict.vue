@@ -25,7 +25,17 @@
             @node-click="handleNodeClick"
             @node-expand="handleNodeExpand"
             @node-collapse="handleNodeCollapse"
-          />
+          >
+            <template #default="{ node, data }">
+              <span class="custom-tree-node">
+                <span>{{ node.label }}</span>
+                <span v-if="data.hasNext">
+                  <a>查看下一页</a>
+                </span>
+              </span>
+            </template>
+          </el-tree>
+          <p v-if="tree.scrollLoading">加载中...</p>
         </div>
       </el-col>
       <el-col :span="18">
@@ -205,7 +215,7 @@
 <script>
 import {add, del, getMaxSort, list, listChildrenByCode, update} from '@/api/sys/dict'
 import Pagination from '@/components/Pagination'
-import {dictConvert, isBlank, isNotEmptyCollection} from '@/utils/common'
+import {dictConvert, isBlank} from '@/utils/common'
 import {format} from '@/utils/time'
 
 export default {
@@ -217,6 +227,8 @@ export default {
       tree: {
         // 过滤树的字段
         filterTreeText: '',
+        // 树滚动下拉加载状态
+        scrollLoading: false,
         // 树的属性重命名
         treeProps: {
           label: 'name',
@@ -231,10 +243,10 @@ export default {
         },
         // 单击被选中节点，给右侧表格列表查询使用
         checkedNodeClick: {},
-        // 点击下拉图标选中的节点，给树使用
+        // 点击下拉图标选中的节点，给树滚动加载使用
         checkedNodeDropdown: {},
         // 当前被点击节点懒加载子树的数据
-        childrenTreeData: [],
+        loadChildrenTreeData: [],
         // 最开始默认展开的node对应的keys
         defaultExpandedKeys: [],
         // tree分页查询对象
@@ -249,7 +261,9 @@ export default {
         // 树查询结果返回节点的总数
         total: 0,
         // 是否能下拉加载数据
-        scrollTreeDisable: false
+        scrollTreeDisable: false,
+        // element resolve方法
+        resolve: undefined
       },
       // 表格
       table: {
@@ -445,8 +459,9 @@ export default {
      * @returns {*}
      */
     async loadNode(node, resolve) {
-      console.log('resolve:', resolve)
-      Object.assign(this.tree.checkedNodeDropdown, node)
+      // 每次赋值成当前节点对应的resolve方法
+      this.tree.resolve = resolve
+      this.tree.checkedNodeDropdown = node
       if (node.level === 0) {
         // 最开始的时候，默认根节点被选中
         console.log('node.level===0,node:', node)
@@ -459,26 +474,64 @@ export default {
         return resolve([this.tree.rootNode])
       }
       if (node.level > 0) {
-        await this.getChildrenNode(node.data.id)
+        // await this.getChildrenNode(node.data.id)
+        this.mockTreeData()
         console.log('node.level>0,node:', node)
-        return resolve(this.tree.childrenTreeData)
+        return resolve(this.tree.loadChildrenTreeData)
       }
+    },
+    // 模拟加载数据
+    mockTreeData() {
+      const mockData = []
+      const temp = {
+        'id': 1,
+        'parentId': 0,
+        'name': '状态',
+        'isLeaf': false,
+        'code': 'status',
+        'value': null,
+        'sort': 1,
+        'description': '系统通用状态',
+        'status': 1,
+        'createTime': '2021-05-10T10:17:14',
+        'modifyTime': null,
+        'creatorName': '超级管理员',
+        'modifierName': null
+      }
+      for (let i = 0; i < 30; i++) {
+        const tempNode = {}
+        Object.assign(tempNode, temp)
+        if (i === 29) {
+          tempNode.hasNext = true
+        }
+        mockData.push(tempNode)
+      }
+      this.tree.loadChildrenTreeData = this.tree.loadChildrenTreeData.concat(mockData)
+      console.log('this.tree.loadChildrenTreeData', this.tree.loadChildrenTreeData)
+      this.tree.total = 50000
     },
     // 滚动下拉树的数据
     scrollTreeData() {
-      console.log('下拉加载,this.tree', this.tree)
-      this.tree.listQuery.page = this.tree.listQuery.page + 1
-      this.tree.listQuery.parentId = this.tree.checkedNodeDropdown.data.id
-      list(this.tree.listQuery).then(response => {
-        this.tree.total = response.data.total
-        // 数据不为空，且滚动框未禁用
-        if (isNotEmptyCollection(response.data.records) && !this.tree.scrollTreeDisable) {
-          // 追加树节点
-          response.data.records.forEach(node => {
-            this.$refs['tree'].append(node, this.tree.checkedNodeDropdown)
-          })
-        }
-      })
+      this.tree.scrollLoading = true
+      setTimeout(() => {
+        this.tree.scrollLoading = false
+        console.log('下拉加载,this.tree', this.tree)
+        this.mockTreeData()
+        this.tree.resolve(this.tree.loadChildrenTreeData)
+      }, 1000)
+
+      // this.tree.listQuery.page = this.tree.listQuery.page + 1
+      // this.tree.listQuery.parentId = this.tree.checkedNodeDropdown.data.id
+      // list(this.tree.listQuery).then(response => {
+      //   this.tree.total = response.data.total
+      //   // 数据不为空，且滚动框未禁用
+      //   if (isNotEmptyCollection(response.data.records) && !this.tree.scrollTreeDisable) {
+      //     // 追加树节点
+      //     response.data.records.forEach(node => {
+      //       this.$refs['tree'].append(node, this.tree.checkedNodeDropdown)
+      //     })
+      //   }
+      // })
     },
     /**
      * 过滤tree的节点
@@ -497,7 +550,7 @@ export default {
     async getChildrenNode(id) {
       this.tree.listQuery.parentId = id
       await list(this.tree.listQuery).then(response => {
-        this.tree.childrenTreeData = response.data.records
+        this.tree.loadChildrenTreeData = response.data.records
         this.tree.total = response.data.total
       })
     },
@@ -553,7 +606,15 @@ export default {
 
 <style scoped>
 .tree-box {
-  height: 800px;
+  height: 200px;
   overflow: auto;
+}
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
 }
 </style>
