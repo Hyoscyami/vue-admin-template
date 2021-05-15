@@ -29,8 +29,8 @@
               <span class="custom-tree-node">
                 <span>{{ node.label }}</span>
                 <el-space spacer="|">
-                  <el-link v-if="data.hasNext" @click="viewNextPage(node.parent)">下一页</el-link>
-                  <el-link @click="handleNodeClick(data,node)">选择</el-link>
+                  <el-link v-if="data.hasNext" href="javascript:void(0);" @click="viewNextPage(node)">下一页</el-link>
+                  <el-link href="javascript:void(0);" @click="handleNodeClick(data,node)">选择</el-link>
                 </el-space>
               </span>
             </template>
@@ -263,9 +263,7 @@ export default {
         // 树查询结果返回节点的总数
         total: 0,
         // 是否能下拉加载数据
-        scrollTreeDisable: false,
-        // element resolve方法
-        resolve: undefined
+        scrollTreeDisable: false
       },
       // 表格
       table: {
@@ -461,13 +459,10 @@ export default {
      * @returns {*}
      */
     async loadNode(node, resolve) {
-      // 每次赋值成当前节点对应的resolve方法
-      this.tree.resolve = resolve
       this.tree.checkedNodeDropdown = node
       if (node.level === 0) {
         // 最开始的时候，默认根节点被选中
-        console.log('node.level===0,node:', node)
-        console.log('根节点加载，this.tree.checkedNode', this.tree.checkedNodeDropdown)
+        console.log('根节点加载，this.tree.checkedNodeDropdown', this.tree.checkedNodeDropdown)
         // 默认展开第二级
         this.$nextTick(() => {
           const rootNode = node.childNodes[0]
@@ -509,18 +504,19 @@ export default {
         }
         mockData.push(tempNode)
       }
-      this.tree.loadChildrenTreeData = this.tree.loadChildrenTreeData.concat(mockData)
-      console.log('this.tree.loadChildrenTreeData', this.tree.loadChildrenTreeData)
+      this.tree.loadChildrenTreeData.length = 0
+      this.tree.loadChildrenTreeData = mockData
       this.tree.total = 50000
     },
     // 清除node的子节点查看下一页的标识
-    clearHasNext(parentNode) {
+    clearHasNext(node) {
+      console.log('clearHasNext的node', node)
       // 下一页取消显示
-      parentNode.childNodes = parentNode.childNodes.map(item => {
-        item.hasNext = false
-        return item
+      node.parent.childNodes.map(item => {
+        this.$set('hasNext', false)
       })
-      this.$refs['tree'].updateKeyChildren(parentNode.id, parentNode.childNodes)
+      console.log('parentNode.childNodes', node.parent.childNodes)
+      this.$refs['tree'].updateKeyChildren(node.id, node.parent.childNodes)
     },
     // 滚动下拉树的数据
     scrollTreeData() {
@@ -529,7 +525,9 @@ export default {
         this.tree.scrollLoading = false
         console.log('下拉加载,this.tree', this.tree)
         this.mockTreeData()
-        this.tree.resolve(this.tree.loadChildrenTreeData)
+        this.tree.loadChildrenTreeData.forEach(node => {
+          this.$refs['tree'].append(node, this.tree.checkedNodeDropdown)
+        })
       }, 1000)
 
       // this.tree.listQuery.page = this.tree.listQuery.page + 1
@@ -613,12 +611,14 @@ export default {
       })
     },
     // 点击下一页
-    viewNextPage(parentNode) {
-      console.log('点击下一页:', parentNode)
+    viewNextPage(clickedNode) {
+      console.log('点击下一页:', clickedNode)
       this.mockTreeData()
       // 清除兄弟节点的下一页超链接
-      this.clearHasNext(parentNode)
-      this.tree.resolve(this.tree.loadChildrenTreeData)
+      this.clearHasNext(clickedNode)
+      this.tree.loadChildrenTreeData.forEach(node => {
+        this.$refs['tree'].append(node, clickedNode.parent)
+      })
     }
   }
 }
