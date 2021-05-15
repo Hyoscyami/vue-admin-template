@@ -233,7 +233,7 @@ export default {
         checkedNodeClick: {},
         // 点击下拉图标选中的节点，给树使用
         checkedNodeDropdown: {},
-        // 子树的数据
+        // 当前被点击节点懒加载子树的数据
         childrenTreeData: [],
         // 最开始默认展开的node对应的keys
         defaultExpandedKeys: [],
@@ -341,8 +341,8 @@ export default {
   },
   watch: {
     // 搜索权限树的时候联动过滤名称符合的树
-    'tree.filterTreeText'(val) {
-      this.$refs.tree.filter(val)
+    'tree.filterTreeText'(searchText) {
+      console.log(searchText)
     },
     // total改变了 ，计算是否能继续滚动加载树
     'tree.total'(val) {
@@ -445,11 +445,17 @@ export default {
      * @returns {*}
      */
     async loadNode(node, resolve) {
+      console.log('resolve:', resolve)
       Object.assign(this.tree.checkedNodeDropdown, node)
       if (node.level === 0) {
         // 最开始的时候，默认根节点被选中
         console.log('node.level===0,node:', node)
         console.log('根节点加载，this.tree.checkedNode', this.tree.checkedNodeDropdown)
+        // 默认展开第二级
+        this.$nextTick(() => {
+          const rootNode = node.childNodes[0]
+          rootNode.expanded = true
+        }).then(r => node.childNodes[0].loadData())
         return resolve([this.tree.rootNode])
       }
       if (node.level > 0) {
@@ -496,9 +502,10 @@ export default {
       })
     },
     // 节点被点击
-    handleNodeClick(data) {
+    handleNodeClick(data, node) {
       // 保存被选择节点
       Object.assign(this.tree.checkedNodeClick, data)
+      console.log('节点被点击data:', data, 'node:', node)
       this.table.listQuery.parentId = data.id
       // 刷新表格
       this.getList()
