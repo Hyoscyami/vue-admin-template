@@ -22,16 +22,16 @@
             :filter-node-method="filterNode"
             :highlight-current="true"
             lazy
-            @node-click="handleNodeClick"
             @node-expand="handleNodeExpand"
             @node-collapse="handleNodeCollapse"
           >
             <template #default="{ node, data }">
               <span class="custom-tree-node">
                 <span>{{ node.label }}</span>
-                <span v-if="data.hasNext">
-                  <a>查看下一页</a>
-                </span>
+                <el-space spacer="|">
+                  <el-link v-if="data.hasNext" @click="viewNextPage(node.parent)">下一页</el-link>
+                  <el-link @click="handleNodeClick(data,node)">选择</el-link>
+                </el-space>
               </span>
             </template>
           </el-tree>
@@ -223,6 +223,8 @@ export default {
   components: {Pagination},
   data() {
     return {
+      // mock的临时变量，待删除
+      tempCount: 1,
       // 树相关
       tree: {
         // 过滤树的字段
@@ -483,24 +485,25 @@ export default {
     // 模拟加载数据
     mockTreeData() {
       const mockData = []
-      const temp = {
-        'id': 1,
-        'parentId': 0,
-        'name': '状态',
-        'isLeaf': false,
-        'code': 'status',
-        'value': null,
-        'sort': 1,
-        'description': '系统通用状态',
-        'status': 1,
-        'createTime': '2021-05-10T10:17:14',
-        'modifyTime': null,
-        'creatorName': '超级管理员',
-        'modifierName': null
-      }
       for (let i = 0; i < 30; i++) {
+        const temp = {
+          'id': this.tempCount,
+          'parentId': 0,
+          'name': '状态' + this.tempCount,
+          'isLeaf': false,
+          'code': 'status',
+          'value': null,
+          'sort': 1,
+          'description': '系统通用状态',
+          'status': 1,
+          'createTime': '2021-05-10T10:17:14',
+          'modifyTime': null,
+          'creatorName': '超级管理员',
+          'modifierName': null
+        }
         const tempNode = {}
         Object.assign(tempNode, temp)
+        this.tempCount++
         if (i === 29) {
           tempNode.hasNext = true
         }
@@ -509,6 +512,15 @@ export default {
       this.tree.loadChildrenTreeData = this.tree.loadChildrenTreeData.concat(mockData)
       console.log('this.tree.loadChildrenTreeData', this.tree.loadChildrenTreeData)
       this.tree.total = 50000
+    },
+    // 清除node的子节点查看下一页的标识
+    clearHasNext(parentNode) {
+      // 下一页取消显示
+      parentNode.childNodes = parentNode.childNodes.map(item => {
+        item.hasNext = false
+        return item
+      })
+      this.$refs['tree'].updateKeyChildren(parentNode.id, parentNode.childNodes)
     },
     // 滚动下拉树的数据
     scrollTreeData() {
@@ -599,6 +611,14 @@ export default {
         })
         data.status = param.status
       })
+    },
+    // 点击下一页
+    viewNextPage(parentNode) {
+      console.log('点击下一页:', parentNode)
+      this.mockTreeData()
+      // 清除兄弟节点的下一页超链接
+      this.clearHasNext(parentNode)
+      this.tree.resolve(this.tree.loadChildrenTreeData)
     }
   }
 }
