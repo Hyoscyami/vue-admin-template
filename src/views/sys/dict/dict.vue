@@ -30,14 +30,14 @@
       </el-col>
       <el-col :span="18">
         <div class="filter-container">
-          <el-form ref="formInline" v-model="table.listQuery" :inline="true">
+          <el-form ref="formInline" :model="table.listQuery" :inline="true">
             <el-form-item label="字典值" prop="code" @keyup.enter.native="searchFormSubmit">
               <el-input v-model="table.listQuery.code" placeholder="字典值" />
             </el-form-item>
             <el-form-item label="描述" prop="description">
               <el-input v-model="table.listQuery.description" placeholder="描述" />
             </el-form-item>
-            <el-form-item label="状态" prop="enable">
+            <el-form-item label="状态" prop="status">
               <el-select v-model="table.listQuery.status" placeholder="状态">
                 <el-option v-for="item in table.statusSelect" :key="item.id" :label="item.name" :value="item.value" />
               </el-select>
@@ -123,22 +123,22 @@
           :before-close="cancelAddForm"
         >
           <el-form ref="addForm" :model="dialog.addForm" :rules="dialog.addFormRules" label-width="80px">
-            <el-form-item label="码值" prop="code">
-              <el-input v-model="dialog.addForm.code" autocomplete="off" />
-            </el-form-item>
             <el-form-item label="字典名称" prop="name">
-              <el-input v-model="dialog.addForm.name" autocomplete="off" />
+              <el-input v-model="dialog.addForm.name" autocomplete="off" tabindex="1" />
+            </el-form-item>
+            <el-form-item label="码值" prop="code">
+              <el-input v-model="dialog.addForm.code" autocomplete="off" tabindex="2" />
             </el-form-item>
             <el-form-item label="值" prop="value">
-              <el-input v-model="dialog.addForm.value" autocomplete="off" />
+              <el-input v-model="dialog.addForm.value" autocomplete="off" tabindex="3" />
             </el-form-item>
             <el-form-item label="描述" prop="description">
-              <el-input v-model="dialog.addForm.description" autocomplete="off" />
+              <el-input v-model="dialog.addForm.description" autocomplete="off" tabindex="4" />
             </el-form-item>
             <el-form-item label="排序值" prop="sort">
-              <el-input v-model="dialog.addForm.sort" autocomplete="off" />
+              <el-input v-model="dialog.addForm.sort" autocomplete="off" tabindex="5" />
             </el-form-item>
-            <el-form-item label="状态" prop="status">
+            <el-form-item label="状态" prop="status" tabindex="6">
               <el-radio-group v-model="dialog.addForm.status">
                 <el-radio v-model="dialog.addForm.status" :label="1">启用</el-radio>
                 <el-radio v-model="dialog.addForm.status" :label="0">禁用</el-radio>
@@ -314,7 +314,7 @@ export default {
             {required: true, message: '请输入字典名称', trigger: 'change'}
           ],
           value: [
-            {required: true, message: '请输入值', trigger: 'change'}
+            {message: '请输入值', trigger: 'change'}
           ],
           description: [
             {message: '请输入描述信息', trigger: 'change'}
@@ -388,7 +388,7 @@ export default {
     // 获取当前最大排序值
     getMaxSort(id) {
       getMaxSort(id).then(response => {
-        this.dialog.addForm.sort = response.data
+        this.dialog.addForm.sort = response.data + 1
       })
     },
     // 新增数据字典表单提交
