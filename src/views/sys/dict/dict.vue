@@ -215,7 +215,7 @@
 <script>
 import {add, del, getMaxSort, list, listChildrenByCode, update} from '@/api/sys/dict'
 import Pagination from '@/components/Pagination'
-import {dictConvert, isBlank} from '@/utils/common'
+import {dictConvert, isBlank, isNotEmptyCollection} from '@/utils/common'
 import {format} from '@/utils/time'
 
 export default {
@@ -479,43 +479,11 @@ export default {
         return resolve([this.tree.rootNode])
       }
       if (node.level > 0) {
-        // await this.getChildrenNode(node.data.id)
-        this.mockTreeData()
+        await this.getChildrenNode(node.data.id)
+        // this.mockTreeData()
         console.log('node.level>0,node:', node)
         return resolve(this.tree.loadChildrenTreeData)
       }
-    },
-    // 模拟加载数据
-    mockTreeData() {
-      const mockData = []
-      for (let i = 0; i < 30; i++) {
-        const temp = {
-          'id': this.tempCount,
-          'parentId': 0,
-          'name': '状态' + this.tempCount,
-          'isLeaf': false,
-          'code': 'status',
-          'value': null,
-          'sort': 1,
-          'description': '系统通用状态',
-          'status': 1,
-          'createTime': '2021-05-10T10:17:14',
-          'modifyTime': null,
-          'creatorName': '超级管理员',
-          'modifierName': null,
-          'hasNext': false
-        }
-        const tempNode = {}
-        Object.assign(tempNode, temp)
-        this.tempCount++
-        if (i === 29) {
-          tempNode.hasNext = true
-        }
-        mockData.push(tempNode)
-      }
-      this.tree.loadChildrenTreeData.length = 0
-      this.tree.loadChildrenTreeData = mockData
-      this.tree.total = 50000
     },
     // 清除node的子节点查看下一页的标识
     clearHasNext(node) {
@@ -527,28 +495,19 @@ export default {
     },
     // 滚动下拉树的数据
     scrollTreeData() {
-      this.tree.scrollLoading = true
-      setTimeout(() => {
-        this.tree.scrollLoading = false
-        console.log('下拉加载,this.tree', this.tree)
-        this.mockTreeData()
-        this.tree.loadChildrenTreeData.forEach(node => {
-          this.$refs['tree'].append(node, this.tree.checkedNodeDropdown)
-        })
-      }, 1000)
-
-      // this.tree.listQuery.page = this.tree.listQuery.page + 1
-      // this.tree.listQuery.parentId = this.tree.checkedNodeDropdown.data.id
-      // list(this.tree.listQuery).then(response => {
-      //   this.tree.total = response.data.total
-      //   // 数据不为空，且滚动框未禁用
-      //   if (isNotEmptyCollection(response.data.records) && !this.tree.scrollTreeDisable) {
-      //     // 追加树节点
-      //     response.data.records.forEach(node => {
-      //       this.$refs['tree'].append(node, this.tree.checkedNodeDropdown)
-      //     })
-      //   }
-      // })
+      this.tree.listQuery.page = this.tree.listQuery.page + 1
+      this.tree.listQuery.parentId = this.tree.checkedNodeDropdown.data.id
+      list(this.tree.listQuery).then(response => {
+        this.tree.total = response.data.total
+        // 数据不为空，且滚动框未禁用
+        if (isNotEmptyCollection(response.data.records) && !this.tree.scrollTreeDisable) {
+          // 追加树节点
+          this.tree.loadChildrenTreeData = response.data.records
+          this.tree.loadChildrenTreeData.forEach(node => {
+            this.$refs['tree'].append(node, this.tree.checkedNodeDropdown)
+          })
+        }
+      })
     },
     /**
      * 过滤tree的节点
@@ -641,7 +600,7 @@ export default {
 
 <style scoped>
 .tree-box {
-  height: 200px;
+  height: 400px;
   overflow: auto;
 }
 .custom-tree-node {
