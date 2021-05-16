@@ -494,7 +494,8 @@ export default {
           'createTime': '2021-05-10T10:17:14',
           'modifyTime': null,
           'creatorName': '超级管理员',
-          'modifierName': null
+          'modifierName': null,
+          'hasNext': false
         }
         const tempNode = {}
         Object.assign(tempNode, temp)
@@ -511,12 +512,10 @@ export default {
     // 清除node的子节点查看下一页的标识
     clearHasNext(node) {
       console.log('clearHasNext的node', node)
-      // 下一页取消显示
-      node.parent.childNodes.map(item => {
-        this.$set('hasNext', false)
-      })
-      console.log('parentNode.childNodes', node.parent.childNodes)
-      this.$refs['tree'].updateKeyChildren(node.id, node.parent.childNodes)
+      const childNodes = node.parent.childNodes
+      // 取消之前下一页的链接
+      const lastNode = this.$refs['tree'].getNode(childNodes[childNodes.length - 1].data.id)
+      lastNode.data.hasNext = false
     },
     // 滚动下拉树的数据
     scrollTreeData() {
@@ -614,7 +613,7 @@ export default {
     viewNextPage(clickedNode) {
       console.log('点击下一页:', clickedNode)
       this.mockTreeData()
-      // 清除兄弟节点的下一页超链接
+      // 清除之前的下一页超链接
       this.clearHasNext(clickedNode)
       this.tree.loadChildrenTreeData.forEach(node => {
         this.$refs['tree'].append(node, clickedNode.parent)
