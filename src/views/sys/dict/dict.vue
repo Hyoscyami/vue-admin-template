@@ -255,6 +255,7 @@ export default {
         listQuery: {
           page: 1,
           limit: 20,
+          name: '',
           parentId: '',
           code: '',
           description: '',
@@ -275,6 +276,7 @@ export default {
           page: 1,
           limit: 20,
           parentId: '',
+          name: '',
           code: '',
           description: '',
           status: undefined
@@ -356,7 +358,13 @@ export default {
   watch: {
     // 搜索权限树的时候联动过滤名称符合的树
     'tree.filterTreeText'(searchText) {
-      console.log(searchText)
+      // 重置树的搜索条件
+      this.resetTreeQuery()
+      this.tree.listQuery.name = searchText
+      list(this.tree.listQuery).then(response => {
+        this.tree.total = response.data.total
+        this.$refs['tree'].updateKeyChildren(this.tree.rootNode.id, response.data.records)
+      })
     },
     // total改变了 ，计算是否能继续滚动加载树
     'tree.total'(val) {
@@ -611,13 +619,21 @@ export default {
     },
     // 点击下一页
     viewNextPage(clickedNode) {
-      console.log('点击下一页:', clickedNode)
       this.mockTreeData()
       // 清除之前的下一页超链接
       this.clearHasNext(clickedNode)
       this.tree.loadChildrenTreeData.forEach(node => {
         this.$refs['tree'].append(node, clickedNode.parent)
       })
+    },
+    // 重置树的搜索条件
+    resetTreeQuery() {
+      this.tree.listQuery.page = 1
+      this.tree.listQuery.parentId = ''
+      this.tree.listQuery.code = ''
+      this.tree.listQuery.description = ''
+      this.tree.listQuery.status = undefined
+      this.tree.total = 0
     }
   }
 }
