@@ -13,7 +13,7 @@ export function add(data) {
 
 export function del(id) {
   return request({
-    url: '/api/dict/delete',
+    url: '/dict/delete',
     method: 'get',
     params: {id}
   })
@@ -21,7 +21,7 @@ export function del(id) {
 
 export function getMaxSort(id) {
   return request({
-    url: '/api/dict/getMaxSort',
+    url: '/dict/getMaxSort',
     method: 'get',
     params: {parentId: id}
   })
@@ -40,7 +40,7 @@ export function list(data) {
 
 export function listChildrenById(id) {
   return request({
-    url: '/dict/listChildrenById',
+    url: '/listChildrenById',
     method: 'get',
     params: {id}
   })
@@ -48,7 +48,7 @@ export function listChildrenById(id) {
 
 export function listChildrenByCode(code) {
   return request({
-    url: '/api/dict/listChildrenByCode',
+    url: '/dict/listChildrenByCode',
     method: 'get',
     params: {code}
   })
@@ -56,7 +56,7 @@ export function listChildrenByCode(code) {
 
 export function update(data) {
   return request({
-    url: '/api/dict/update',
+    url: '/dict/update',
     method: 'post',
     headers: {
       'Content-Type': 'application/json;charset=UTF-8'
@@ -67,7 +67,7 @@ export function update(data) {
 
 export function getDetailByCode(code) {
   return request({
-    url: '/api/dict/getDetailByCode',
+    url: '/dict/getDetailByCode',
     method: 'get',
     params: {code}
   })

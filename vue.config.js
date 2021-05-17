@@ -37,7 +37,7 @@ module.exports = {
       errors: true
     },
     proxy: {
-      '/mock': {
+      '/api/mock': {
         target: `http://localhost:${port}/mock`,
         changeOrigin: true
       },

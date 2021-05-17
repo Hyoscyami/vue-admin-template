@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function login(data) {
   return request({
-    url: '/api/operator/login',
+    url: '/operator/login',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function login(data) {
 
 export function getInfo(token) {
   return request({
-    url: '/api/operator/getUserInfo',
+    url: '/operator/getUserInfo',
     method: 'get',
     params: { token }
   })
@@ -18,11 +18,11 @@ export function getInfo(token) {
 
 export function logout() {
   return request({
-    url: '/api/operator/logout',
+    url: '/operator/logout',
     method: 'post'
   })
 }
 
 export function getCaptcha() {
-  return request({url: '/api/getCaptcha', method: 'get'})
+  return request({url: '/getCaptcha', method: 'get'})
 }

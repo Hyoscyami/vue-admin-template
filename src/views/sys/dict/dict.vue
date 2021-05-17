@@ -21,6 +21,7 @@
             :expand-on-click-node="false"
             :highlight-current="true"
             lazy
+            @node-click="handleNodeClick"
             @node-expand="handleNodeExpand"
             @node-collapse="handleNodeCollapse"
           >
@@ -28,8 +29,7 @@
               <span class="custom-tree-node">
                 <span>{{ node.label }}</span>
                 <el-space spacer="|">
-                  <el-link v-if="data.hasNext" href="javascript:void(0);" @click="viewNextPage(node)">下一页</el-link>
-                  <el-link href="javascript:void(0);" @click="handleNodeClick(data,node)">选择</el-link>
+                  <el-link v-if="data.hasNext" href="javascript:void(0);" @click.stop="viewNextPage(node)">下一页</el-link>
                 </el-space>
               </span>
             </template>
