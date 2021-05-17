@@ -359,16 +359,7 @@ export default {
   watch: {
     // 搜索权限树的时候联动过滤名称符合的树
     'tree.filterTreeText'(searchText) {
-      // 重置树的搜索条件
-      this.resetTreeQuery()
-      if (isBlank(searchText)) {
-        this.tree.listQuery.parentId = this.tree.rootNode.id
-      }
-      this.tree.listQuery.name = searchText
-      list(this.tree.listQuery).then(response => {
-        this.tree.total = response.data.total
-        this.$refs['tree'].updateKeyChildren(this.tree.rootNode.id, response.data.records)
-      })
+      this.filterTree(searchText)
     },
     // total改变了 ，计算是否能继续滚动加载树
     'tree.total'(val) {
@@ -384,6 +375,19 @@ export default {
     this.searchFormSubmit()
   },
   methods: {
+    // 搜索tree
+    filterTree(searchText) {
+      // 重置树的搜索条件
+      this.resetTreeQuery()
+      if (isBlank(searchText)) {
+        this.tree.listQuery.parentId = this.tree.rootNode.id
+      }
+      this.tree.listQuery.name = searchText
+      list(this.tree.listQuery).then(response => {
+        this.tree.total = response.data.total
+        this.$refs['tree'].updateKeyChildren(this.tree.rootNode.id, response.data.records)
+      })
+    },
     // 搜索数据字典表单查询
     searchFormSubmit() {
       this.table.listQuery.page = 1
@@ -422,7 +426,12 @@ export default {
       this.$refs['addForm'].validate((valid) => {
         if (valid) {
           add(JSON.stringify(this.dialog.addForm)).then(response => {
+            // 关闭弹框
             this.cancelAddForm()
+            // 刷新表格
+            this.getList()
+            // 刷新树
+            this.filterTree()
           })
         } else {
           return false
@@ -485,7 +494,6 @@ export default {
       }
       if (node.level > 0) {
         await this.getChildrenNode(node.data.id)
-        // this.mockTreeData()
         console.log('node.level>0,node:', node)
         return resolve(this.tree.loadChildrenTreeData)
       }
