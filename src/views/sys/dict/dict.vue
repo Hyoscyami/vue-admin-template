@@ -216,6 +216,7 @@ import {add, del, getMaxSort, list, listChildrenByCode, update} from '@/api/sys/
 import Pagination from '@/components/Pagination'
 import {dictConvert, isBlank, isNotEmptyCollection} from '@/utils/common'
 import {format} from '@/utils/time'
+import {DictEnum} from '@/constants/dict'
 
 export default {
   name: 'Dict',
@@ -255,8 +256,8 @@ export default {
           page: 1,
           limit: 20,
           name: '',
-          isSearch: false,
-          parentId: '',
+          isSearch: true,
+          parentId: undefined,
           code: '',
           description: '',
           status: undefined
@@ -275,8 +276,8 @@ export default {
         listQuery: {
           page: 1,
           limit: 20,
-          parentId: '',
-          isSearch: false,
+          parentId: undefined,
+          isSearch: true,
           name: '',
           code: '',
           description: '',
@@ -450,6 +451,7 @@ export default {
     // 获取父数据字段列表数据
     getList() {
       this.table.listLoading = true
+      this.table.listQuery.parentId = this.tree.checkedNodeClick.id
       list(this.table.listQuery).then(response => {
         console.log('getList:response,', response)
         this.table.tableData = response.data.records
@@ -489,6 +491,9 @@ export default {
         this.$nextTick(() => {
           const rootNode = node.childNodes[0]
           rootNode.expanded = true
+          // 默认选中根节点
+          this.$refs['tree'].setCurrentKey(rootNode.id, true)
+          Object.assign(this.tree.checkedNodeClick, rootNode)
         }).then(r => node.childNodes[0].loadData())
         return resolve([this.tree.rootNode])
       }
@@ -527,10 +532,12 @@ export default {
      * @param id 当前节点id
      */
     async getChildrenNode(id) {
+      console.log('getChildrenNode:id', id)
       this.tree.listQuery.parentId = id
       await list(this.tree.listQuery).then(response => {
         this.tree.loadChildrenTreeData = response.data.records
         this.tree.total = response.data.total
+        console.log('this.tree.loadChildrenTreeData', this.tree.loadChildrenTreeData)
       })
     },
     // 节点被点击
@@ -554,7 +561,7 @@ export default {
     },
     // 获取状态下拉框
     listStatus() {
-      listChildrenByCode('status').then(response => {
+      listChildrenByCode(DictEnum.DictStatus).then(response => {
         this.table.statusSelect = response.data
       })
     },
@@ -591,7 +598,7 @@ export default {
     // 重置树的搜索条件
     resetTreeQuery() {
       this.tree.listQuery.page = 1
-      this.tree.listQuery.parentId = ''
+      this.tree.listQuery.parentId = undefined
       this.tree.listQuery.code = ''
       this.tree.listQuery.description = ''
       this.tree.listQuery.status = undefined

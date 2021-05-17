@@ -1,3 +1,3 @@
 export const DictEnum = Object.freeze({
-  Status: 1
+  DictStatus: 'sys:status'
 })
