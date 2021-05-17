@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function add(data) {
   return request({
-    url: '/dict/add',
+    url: '/api/dict/add',
     method: 'post',
     headers: {
       'Content-Type': 'application/json;charset=UTF-8'
@@ -13,7 +13,7 @@ export function add(data) {
 
 export function del(id) {
   return request({
-    url: '/dict/delete',
+    url: '/api/dict/delete',
     method: 'get',
     params: {id}
   })
@@ -21,7 +21,7 @@ export function del(id) {
 
 export function getMaxSort(id) {
   return request({
-    url: '/dict/getMaxSort',
+    url: '/api/dict/getMaxSort',
     method: 'get',
     params: {parentId: id}
   })
@@ -29,7 +29,7 @@ export function getMaxSort(id) {
 
 export function list(data) {
   return request({
-    url: '/dict/list',
+    url: '/mock/dict/list',
     method: 'post',
     headers: {
       'Content-Type': 'application/json;charset=UTF-8'
@@ -48,7 +48,7 @@ export function listChildrenById(id) {
 
 export function listChildrenByCode(code) {
   return request({
-    url: '/dict/listChildrenByCode',
+    url: '/api/dict/listChildrenByCode',
     method: 'get',
     params: {code}
   })
@@ -56,7 +56,7 @@ export function listChildrenByCode(code) {
 
 export function update(data) {
   return request({
-    url: '/dict/update',
+    url: '/api/dict/update',
     method: 'post',
     headers: {
       'Content-Type': 'application/json;charset=UTF-8'
@@ -67,7 +67,7 @@ export function update(data) {
 
 export function getDetailByCode(code) {
   return request({
-    url: '/dict/getDetailByCode',
+    url: '/api/dict/getDetailByCode',
     method: 'get',
     params: {code}
   })

@@ -1,1 +1,3 @@
-export const status = 'status'
+export const DictEnum = Object.freeze({
+  Status: 1
+})

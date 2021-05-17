@@ -377,7 +377,7 @@ export default {
       console.log('监听到total改变，scrollTreeDisable', this.tree.scrollTreeDisable)
     }
   },
-  created() {
+  mounted() {
     // 初始化状态
     this.listStatus()
     // 初始化表格
@@ -442,6 +442,7 @@ export default {
     getList() {
       this.table.listLoading = true
       list(this.table.listQuery).then(response => {
+        console.log('getList:response,', response)
         this.table.tableData = response.data.records
         this.table.total = response.data.total
         this.table.listLoading = false
@@ -572,7 +573,7 @@ export default {
     },
     // 点击下一页
     viewNextPage(clickedNode) {
-      this.mockTreeData()
+      this.scrollTreeData()
       // 清除之前的下一页超链接
       this.clearHasNext(clickedNode)
       this.tree.loadChildrenTreeData.forEach(node => {
