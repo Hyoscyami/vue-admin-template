@@ -1,7 +1,7 @@
 const Mock = require('mockjs')
 
 const data = Mock.mock({
-  'records|30': [{
+  'records|20': [{
     id: '@id',
     parentId: 0,
     name: '状态@id',
