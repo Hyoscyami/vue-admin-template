@@ -19,7 +19,6 @@
             :load="loadNode"
             :default-expanded-keys="tree.defaultExpandedKeys"
             :expand-on-click-node="false"
-            :filter-node-method="filterNode"
             :highlight-current="true"
             lazy
             @node-expand="handleNodeExpand"
@@ -256,7 +255,7 @@ export default {
           page: 1,
           limit: 20,
           name: '',
-          isSearch: true,
+          isSearch: false,
           parentId: '',
           code: '',
           description: '',
@@ -362,6 +361,9 @@ export default {
     'tree.filterTreeText'(searchText) {
       // 重置树的搜索条件
       this.resetTreeQuery()
+      if (isBlank(searchText)) {
+        this.tree.listQuery.parentId = this.tree.rootNode.id
+      }
       this.tree.listQuery.name = searchText
       list(this.tree.listQuery).then(response => {
         this.tree.total = response.data.total
@@ -510,16 +512,6 @@ export default {
           })
         }
       })
-    },
-    /**
-     * 过滤tree的节点
-     * @param value 搜索关键字
-     * @param data 数据
-     * @returns {boolean} 匹配成功返回true，不成功返回false
-     */
-    filterNode(value, data) {
-      if (!value) return true
-      return data.name.indexOf(value) !== -1
     },
     /**
      * 根据id获取直接子节点
