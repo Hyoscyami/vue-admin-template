@@ -62,7 +62,7 @@
         <el-col :span="6" :offset="3">
           <img
             style="width: 150px; height: 50px"
-            :src="url"
+            :src="verifyCodeUrl"
             alt="验证码加载失败"
             @click="changeVerifyCode"
           >
@@ -82,36 +82,23 @@
 </template>
 
 <script>
-import {validUsername} from '@/utils/validate'
 import {getCaptcha} from '@/api/user'
 import {onMounted, ref, unref, watch, nextTick, reactive} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useStore} from 'vuex'
+import {
+  validatePassword,
+  validateUsername,
+  validateVerifyCode
+} from '@/composables/login/login'
 
 export default {
   name: 'Login',
   setup() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('请输入账号'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('请输入密码'))
-      } else {
-        callback()
-      }
-    }
-    const validateVerifyCode = (rule, value, callback) => {
-      if (value.length < 4) {
-        callback(new Error('请输入验证码'))
-      } else {
-        callback()
-      }
-    }
+    const router = useRouter()
+    const route = useRoute()
+    const store = useStore()
+
     // 登录表单，定义对象一般用reactive
     const loginForm = reactive({
       username: '',
@@ -119,7 +106,9 @@ export default {
       verifyCode: '',
       verifyCodeId: ''
     })
+    // ref表单，this.refs.loginFormRef.XXX等于vue3里的loginFormRef.XXX
     const loginFormRef = ref(null)
+    // ref密码input框
     const passwordRef = ref(null)
     // 登录规则
     const loginRules = {
@@ -127,14 +116,13 @@ export default {
       password: [{required: true, trigger: 'blur', validator: validatePassword}],
       verifyCode: [{required: true, trigger: 'blur', validator: validateVerifyCode}]
     }
+    // 登录loading
     const loading = ref(false)
     const passwordType = ref('password')
+    // 登录后重定向跳转，如果链接附带了重定向地址，则跳转
     const redirect = ref(undefined)
-    const url = ref('')
-
-    const router = useRouter()
-    const route = useRoute()
-    const store = useStore()
+    // 验证码地址
+    const verifyCodeUrl = ref('')
 
     watch(() => route, (route) => {
       redirect.value = route.query && route.query.redirect
@@ -143,7 +131,7 @@ export default {
     })
     const changeVerifyCode = () => {
       getCaptcha().then(response => {
-        url.value = response.data.verifyCodeStr
+        verifyCodeUrl.value = response.data.verifyCodeStr
         loginForm.verifyCodeId = response.data.id
       })
     }
@@ -177,8 +165,7 @@ export default {
       loginRules,
       loading,
       passwordType,
-      redirect,
-      url,
+      verifyCodeUrl,
       loginFormRef,
       passwordRef,
       showPwd,
