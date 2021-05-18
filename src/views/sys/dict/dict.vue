@@ -256,7 +256,7 @@ export default {
           page: 1,
           limit: 20,
           name: '',
-          isSearch: true,
+          isSearch: false,
           parentId: undefined,
           code: '',
           description: '',
@@ -384,6 +384,7 @@ export default {
         this.tree.listQuery.parentId = this.tree.rootNode.id
       }
       this.tree.listQuery.name = searchText
+      this.tree.listQuery.isSearch = true
       list(this.tree.listQuery).then(response => {
         this.tree.total = response.data.total
         this.$refs['tree'].updateKeyChildren(this.tree.rootNode.id, response.data.records)
@@ -533,6 +534,8 @@ export default {
      */
     async getChildrenNode(id) {
       console.log('getChildrenNode:id', id)
+      // 重置查询条件
+      this.resetTreeQuery()
       this.tree.listQuery.parentId = id
       await list(this.tree.listQuery).then(response => {
         this.tree.loadChildrenTreeData = response.data.records
@@ -602,6 +605,8 @@ export default {
       this.tree.listQuery.code = ''
       this.tree.listQuery.description = ''
       this.tree.listQuery.status = undefined
+      this.tree.listQuery.isSearch = false
+      this.tree.listQuery.name = ''
       this.tree.total = 0
     }
   }
