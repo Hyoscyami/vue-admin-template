@@ -82,11 +82,12 @@
 </template>
 
 <script>
-import {getCaptcha} from '@/api/user'
-import {onMounted, ref, unref, watch, nextTick, reactive} from 'vue'
+import {onMounted, reactive, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useStore} from 'vuex'
 import {
+  useChangeVerifyCode,
+  useShowPwd,
   validatePassword,
   validateUsername,
   validateVerifyCode
@@ -129,22 +130,10 @@ export default {
     }, {
       immediate: true
     })
-    const changeVerifyCode = () => {
-      getCaptcha().then(response => {
-        verifyCodeUrl.value = response.data.verifyCodeStr
-        loginForm.verifyCodeId = response.data.id
-      })
-    }
+    const {changeVerifyCode} = useChangeVerifyCode(verifyCodeUrl, loginForm)
     onMounted(changeVerifyCode)
 
-    const showPwd = () => {
-      if (unref(passwordType) === 'password') {
-        passwordType.value = ''
-      } else {
-        passwordType.value = 'password'
-      }
-      nextTick(() => { passwordRef.value.focus() })
-    }
+    const {showPwd} = useShowPwd(passwordType, passwordRef)
     const handleLogin = () => {
       loginFormRef.value.validate(valid => {
         if (valid) {

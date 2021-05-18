@@ -350,7 +350,7 @@ export default {
   computed: {
     // 状态转换
     viewDetailDataStatus: function() {
-      return dictConvert('status', this.dialog.viewDetailData.status)
+      return dictConvert(DictEnum.DictStatus, this.dialog.viewDetailData.status)
     },
     // 日期转换
     viewDetailDataCreateTime: function() {

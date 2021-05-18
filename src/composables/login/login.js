@@ -1,15 +1,7 @@
 import {validUsername} from '@/utils/validate'
 import {getCaptcha} from '@/api/user'
 import {nextTick, unref} from 'vue'
-import {useRouter} from 'vue-router'
-import {useStore} from 'vuex'
 
-const router = useRouter()
-const store = useStore()
-
-export function validLoginForm() {
-  return {validateUsername, validatePassword, validateVerifyCode}
-}
 // 校验用户名
 export const validateUsername = (rule, value, callback) => {
   if (!validUsername(value)) {
@@ -40,34 +32,41 @@ export const redirectUrl = (route, redirect) => {
 }
 
 // 修改验证码
-export const changeVerifyCode = (verifyCodeUrl, loginForm) => {
-  getCaptcha().then(response => {
+export function useChangeVerifyCode(verifyCodeUrl, loginForm) {
+  const changeVerifyCode = () => getCaptcha().then(response => {
     verifyCodeUrl.value = response.data.verifyCodeStr
     loginForm.verifyCodeId = response.data.id
   })
+  return {changeVerifyCode}
 }
 // 显示密码
-export const showPwd = (passwordType, passwordRef) => {
-  if (unref(passwordType) === 'password') {
-    passwordType.value = ''
-  } else {
-    passwordType.value = 'password'
+export function useShowPwd(passwordType, passwordRef) {
+  const showPwd = () => {
+    if (unref(passwordType) === 'password') {
+      passwordType.value = ''
+    } else {
+      passwordType.value = 'password'
+    }
+    nextTick(() => { passwordRef.value.focus() })
   }
-  nextTick(() => { passwordRef.value.focus() })
+  return {showPwd}
 }
 // 登录
-export const handleLogin = (loginFormRef, loginForm, loading, redirect) => {
-  loginFormRef.value.validate(valid => {
-    if (valid) {
-      loading.value = true
-      store.dispatch('user/login', loginForm).then(() => {
-        router.push({path: redirect.value || '/'})
-        loading.value = false
-      }).catch(() => {
-        loading.value = false
-      })
-    } else {
-      return false
-    }
-  })
-}
+// export function useHandleLogin(loginFormRef, loginForm, loading, redirect) {
+//   const handleLogin = () => {
+//     loginFormRef.value.validate(valid => {
+//       if (valid) {
+//         loading.value = true
+//         store.dispatch('user/login', loginForm).then(() => {
+//           router.push({path: redirect.value || '/'})
+//           loading.value = false
+//         }).catch(() => {
+//           loading.value = false
+//         })
+//       } else {
+//         return false
+//       }
+//     })
+//   }
+//   return {handleLogin}
+// }
