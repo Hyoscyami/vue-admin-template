@@ -1,7 +1,7 @@
 <template>
   <el-container class="login-container">
     <el-form
-      ref="loginForm"
+      ref="loginFormRef"
       :model="loginForm"
       :rules="loginRules"
       class="login-form"
@@ -33,7 +33,7 @@
         </span>
         <el-input
           :key="passwordType"
-          ref="password"
+          ref="passwordRef"
           v-model="loginForm.password"
           :type="passwordType"
           placeholder="Password"
@@ -84,10 +84,13 @@
 <script>
 import {validUsername} from '@/utils/validate'
 import {getCaptcha} from '@/api/user'
+import {onMounted, ref, unref, watch, nextTick, reactive} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {useStore} from 'vuex'
 
 export default {
   name: 'Login',
-  data() {
+  setup() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
         callback(new Error('请输入账号'))
@@ -109,68 +112,78 @@ export default {
         callback()
       }
     }
-    return {
-      loginForm: {
-        username: '',
-        password: '',
-        verifyCode: '',
-        verifyCodeId: ''
-      },
-      loginRules: {
-        username: [{required: true, trigger: 'blur', validator: validateUsername}],
-        password: [{required: true, trigger: 'blur', validator: validatePassword}],
-        verifyCode: [{required: true, trigger: 'blur', validator: validateVerifyCode}]
-      },
-      loading: false,
-      passwordType: 'password',
-      redirect: undefined,
-      fits: ['fill', 'contain', 'cover', 'none', 'scale-down'],
-      url: ''
+    // 登录表单，定义对象一般用reactive
+    const loginForm = reactive({
+      username: '',
+      password: '',
+      verifyCode: '',
+      verifyCodeId: ''
+    })
+    const loginFormRef = ref(null)
+    const passwordRef = ref(null)
+    // 登录规则
+    const loginRules = {
+      username: [{required: true, trigger: 'blur', validator: validateUsername}],
+      password: [{required: true, trigger: 'blur', validator: validatePassword}],
+      verifyCode: [{required: true, trigger: 'blur', validator: validateVerifyCode}]
     }
-  },
-  watch: {
-    $route: {
-      handler: function(route) {
-        this.redirect = route.query && route.query.redirect
-      },
+    const loading = ref(false)
+    const passwordType = ref('password')
+    const redirect = ref(undefined)
+    const url = ref('')
+
+    const router = useRouter()
+    const route = useRoute()
+    const store = useStore()
+
+    watch(() => route, (route) => {
+      redirect.value = route.query && route.query.redirect
+    }, {
       immediate: true
-    }
-  },
-  created() {
-    // 验证码初始化
-    this.changeVerifyCode()
-  },
-  methods: {
-    showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
+    })
+    const changeVerifyCode = () => {
+      getCaptcha().then(response => {
+        url.value = response.data.verifyCodeStr
+        loginForm.verifyCodeId = response.data.id
       })
-    },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+    }
+    onMounted(changeVerifyCode)
+
+    const showPwd = () => {
+      if (unref(passwordType) === 'password') {
+        passwordType.value = ''
+      } else {
+        passwordType.value = 'password'
+      }
+      nextTick(() => { passwordRef.value.focus() })
+    }
+    const handleLogin = () => {
+      loginFormRef.value.validate(valid => {
         if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({path: this.redirect || '/'})
-            this.loading = false
+          loading.value = true
+          store.dispatch('user/login', loginForm).then(() => {
+            router.push({path: redirect.value || '/'})
+            loading.value = false
           }).catch(() => {
-            this.loading = false
+            loading.value = false
           })
         } else {
           return false
         }
       })
-    },
-    changeVerifyCode() {
-      getCaptcha().then(response => {
-        this.url = response.data.verifyCodeStr
-        this.loginForm.verifyCodeId = response.data.id
-      })
+    }
+    return {
+      loginForm,
+      loginRules,
+      loading,
+      passwordType,
+      redirect,
+      url,
+      loginFormRef,
+      passwordRef,
+      showPwd,
+      handleLogin,
+      changeVerifyCode
     }
   }
 }
