@@ -387,7 +387,7 @@ export default {
       this.tree.listQuery.isSearch = true
       list(this.tree.listQuery).then(response => {
         this.tree.total = response.data.total
-        this.$refs['tree'].updateKeyChildren(this.tree.rootNode.id, response.data.records)
+        this.$refs.tree.updateKeyChildren(this.tree.rootNode.id, response.data.records)
       })
     },
     // 搜索数据字典表单查询
@@ -493,7 +493,7 @@ export default {
           const rootNode = node.childNodes[0]
           rootNode.expanded = true
           // 默认选中根节点
-          this.$refs['tree'].setCurrentKey(rootNode.id, true)
+          this.$refs.tree.setCurrentKey(rootNode.id, true)
           Object.assign(this.tree.checkedNodeClick, rootNode)
         }).then(r => node.childNodes[0].loadData())
         return resolve([this.tree.rootNode])
@@ -509,7 +509,7 @@ export default {
       console.log('clearHasNext的node', node)
       const childNodes = node.parent.childNodes
       // 取消之前下一页的链接
-      const lastNode = this.$refs['tree'].getNode(childNodes[childNodes.length - 1].data.id)
+      const lastNode = this.$refs.tree.getNode(childNodes[childNodes.length - 1].data.id)
       lastNode.data.hasNext = false
     },
     // 滚动下拉树的数据
@@ -523,7 +523,7 @@ export default {
           // 追加树节点
           this.tree.loadChildrenTreeData = response.data.records
           this.tree.loadChildrenTreeData.forEach(node => {
-            this.$refs['tree'].append(node, this.tree.checkedNodeDropdown)
+            this.$refs.tree.append(node, this.tree.checkedNodeDropdown)
           })
         }
       })
@@ -595,7 +595,7 @@ export default {
       // 清除之前的下一页超链接
       this.clearHasNext(clickedNode)
       this.tree.loadChildrenTreeData.forEach(node => {
-        this.$refs['tree'].append(node, clickedNode.parent)
+        this.$refs.tree.append(node, clickedNode.parent)
       })
     },
     // 重置树的搜索条件
