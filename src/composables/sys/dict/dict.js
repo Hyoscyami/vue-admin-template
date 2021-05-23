@@ -68,7 +68,7 @@ export function useGetList(table, tree) {
 export function useViewDetail(dialog, row) {
   const viewDetail = () => {
     dialog.viewDialogVisible = true
-    Object.assign(this.dialog.viewDetailData, unref(row))
+    Object.assign(dialog.viewDetailData, row)
   }
   return {viewDetail}
 }
