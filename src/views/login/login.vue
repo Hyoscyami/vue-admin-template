@@ -68,6 +68,9 @@
           >
         </el-col>
       </el-row>
+      <el-row>
+        <el-checkbox v-model="loginForm.rememberMe" true-label="yes" false-label="no">记住我</el-checkbox>
+      </el-row>
       <el-button
         :loading="loading"
         type="primary"
@@ -105,7 +108,8 @@ export default {
       username: '',
       password: '',
       verifyCode: '',
-      verifyCodeId: ''
+      verifyCodeId: '',
+      rememberMe: 'yes'
     })
     // ref表单，this.refs.loginFormRef.XXX等于vue3里的loginFormRef.XXX
     const loginFormRef = ref(null)

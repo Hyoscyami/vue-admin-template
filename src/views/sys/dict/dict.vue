@@ -223,8 +223,6 @@ export default {
   components: {Pagination},
   data() {
     return {
-      // mock的临时变量，待删除
-      tempCount: 1,
       // 树相关
       tree: {
         // 过滤树的字段
@@ -243,8 +241,10 @@ export default {
           parentId: 0,
           isLeaf: false
         },
-        // 单击被选中节点，给右侧表格列表查询使用
-        checkedNodeClick: {},
+        // 单击被选中节点，给右侧表格列表查询使用，默认是根节点，因为mounted里会初始化表格，而tree初始化这个字段在初始化表格之后
+        checkedNodeClick: {
+          id: 0
+        },
         // 点击下拉图标选中的节点，给树滚动加载使用
         checkedNodeDropdown: {},
         // 当前被点击节点懒加载子树的数据
@@ -494,7 +494,7 @@ export default {
           rootNode.expanded = true
           // 默认选中根节点
           this.$refs.tree.setCurrentKey(rootNode.id, true)
-          Object.assign(this.tree.checkedNodeClick, rootNode)
+          Object.assign(this.tree.checkedNodeClick, node)
         }).then(r => node.childNodes[0].loadData())
         return resolve([this.tree.rootNode])
       }
