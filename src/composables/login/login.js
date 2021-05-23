@@ -26,11 +26,6 @@ export const validateVerifyCode = (rule, value, callback) => {
     callback()
   }
 }
-// 重定向地址
-export const redirectUrl = (route, redirect) => {
-  redirect.value = route.query && route.query.redirect
-}
-
 // 修改验证码
 export function useChangeVerifyCode(verifyCodeUrl, loginForm) {
   const changeVerifyCode = () => getCaptcha().then(response => {
@@ -42,6 +37,7 @@ export function useChangeVerifyCode(verifyCodeUrl, loginForm) {
 // 显示密码
 export function useShowPwd(passwordType, passwordRef) {
   const showPwd = () => {
+    // 取消变量的响应直接用值对比
     if (unref(passwordType) === 'password') {
       passwordType.value = ''
     } else {
@@ -51,22 +47,3 @@ export function useShowPwd(passwordType, passwordRef) {
   }
   return {showPwd}
 }
-// 登录
-// export function useHandleLogin(loginFormRef, loginForm, loading, redirect) {
-//   const handleLogin = () => {
-//     loginFormRef.value.validate(valid => {
-//       if (valid) {
-//         loading.value = true
-//         store.dispatch('user/login', loginForm).then(() => {
-//           router.push({path: redirect.value || '/'})
-//           loading.value = false
-//         }).catch(() => {
-//           loading.value = false
-//         })
-//       } else {
-//         return false
-//       }
-//     })
-//   }
-//   return {handleLogin}
-// }
