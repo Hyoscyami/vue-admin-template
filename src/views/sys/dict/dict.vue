@@ -64,6 +64,7 @@
           v-loading="table.listLoading"
           :data="table.tableData"
           style="width: 100%"
+          border
         >
           <el-table-column
             type="selection"
@@ -122,7 +123,7 @@
           v-show="table.total>0"
           :total="table.total"
           :page.sync="table.listQuery.page"
-          :limit.sync="table.listQuery.limit"
+          :limit.sync="table.listQuery.size"
           @pagination="getList"
         />
         <!--新增或编辑弹框-->
@@ -254,7 +255,7 @@ export default {
         // tree分页查询对象
         listQuery: {
           page: 1,
-          limit: 20,
+          size: 100,
           name: '',
           isSearch: false,
           parentId: undefined,
@@ -275,7 +276,7 @@ export default {
         listLoading: true,
         listQuery: {
           page: 1,
-          limit: 20,
+          size: 20,
           parentId: undefined,
           isSearch: true,
           name: '',
@@ -365,7 +366,7 @@ export default {
     // total改变了 ，计算是否能继续滚动加载树
     'tree.total'(val) {
       // 小于总数，启用滚动
-      this.tree.scrollTreeDisable = this.tree.listQuery.page * this.tree.listQuery.limit >= this.tree.total
+      this.tree.scrollTreeDisable = this.tree.listQuery.page * this.tree.listQuery.size >= this.tree.total
       console.log('监听到total改变，scrollTreeDisable', this.tree.scrollTreeDisable)
     }
   },
@@ -613,7 +614,8 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+$bg: #283443;
 .tree-box {
   height: 400px;
   overflow: auto;
