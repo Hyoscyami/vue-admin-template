@@ -5,14 +5,15 @@
         v-for="tag in visitedViews"
         ref="tag"
         :key="tag.path"
+        v-slot="{ navigate }"
         :class="isActive(tag)?'active':''"
         :to="{ path: tag.path, query: tag.query, fullPath: tag.fullPath }"
-        tag="span"
+        custom
         class="tags-view-item"
         @click.middle.native="!isAffix(tag)?closeSelectedTag(tag):''"
         @contextmenu.prevent.native="openMenu(tag,$event)"
       >
-        {{ tag.title }}
+        <span role="link" @click="navigate" @keypress.enter="navigate">{{ tag.title }}</span>
         <span v-if="!isAffix(tag)" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
       </router-link>
     </scroll-pane>
