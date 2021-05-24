@@ -76,6 +76,12 @@ export const constantRoutes = [
         name: 'Dict',
         component: () => import('@/views/sys/dict/dict'),
         meta: {title: '字典管理', icon: 'table'}
+      },
+      {
+        path: 'config',
+        name: 'Config',
+        component: () => import('@/views/sys/config/config'),
+        meta: {title: '系统设置', icon: 'table'}
       }
     ]
   },
@@ -87,7 +93,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: constantRoutes
 })
-
+export const asyncRoutes = []
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
   const newRouter = createRouter({
