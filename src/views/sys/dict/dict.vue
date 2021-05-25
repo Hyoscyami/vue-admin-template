@@ -47,7 +47,7 @@
               <el-input v-model="table.listQuery.description" placeholder="描述" />
             </el-form-item>
             <el-form-item label="状态" prop="status">
-              <el-select v-model="table.listQuery.status" placeholder="状态">
+              <el-select v-model="table.listQuery.status" placeholder="状态" clearable>
                 <el-option v-for="item in table.statusSelect" :key="item.id" :label="item.name" :value="item.value" />
               </el-select>
             </el-form-item>
@@ -622,7 +622,7 @@ export default {
     },
     // 表头样式
     headerClass() {
-      return {borderColor: '#0e2231', background: '#b1b3b8', color: '#151617'}
+      return {borderColor: '#0e2231', background: '#6b7ca7', color: '#151617'}
     }
   }
 }

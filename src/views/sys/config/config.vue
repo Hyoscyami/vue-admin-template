@@ -10,7 +10,7 @@
             <el-input v-model="table.listQuery.code" placeholder="码值" />
           </el-form-item>
           <el-form-item label="状态" prop="status">
-            <el-select v-model="table.listQuery.status" placeholder="状态">
+            <el-select v-model="table.listQuery.status" placeholder="状态" clearable>
               <el-option v-for="item in table.statusSelect" :key="item.id" :label="item.name" :value="item.value" />
             </el-select>
           </el-form-item>
