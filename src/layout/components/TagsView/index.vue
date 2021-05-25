@@ -3,12 +3,11 @@
     <scroll-pane ref="scrollPane" class="tags-view-wrapper" @scroll="handleScroll">
       <router-link
         v-for="tag in visitedViews"
-        ref="tag"
+        :ref="setItemRef"
         :key="tag.path"
         v-slot="{ navigate }"
         :class="isActive(tag)?'active':''"
         :to="{ path: tag.path, query: tag.query, fullPath: tag.fullPath }"
-        custom
         class="tags-view-item"
         @click.middle.native="!isAffix(tag)?closeSelectedTag(tag):''"
         @contextmenu.prevent.native="openMenu(tag,$event)"
@@ -38,7 +37,8 @@ export default {
       top: 0,
       left: 0,
       selectedTag: {},
-      affixTags: []
+      affixTags: [],
+      itemRefs: []
     }
   },
   computed: {
@@ -67,6 +67,12 @@ export default {
     this.addTags()
   },
   methods: {
+    // vue3不支持this.$refs数组，需要自己绑定
+    setItemRef(el) {
+      if (el) {
+        this.itemRefs.push(el)
+      }
+    },
     isActive(route) {
       return route.path === this.$route.path
     },
@@ -111,7 +117,8 @@ export default {
       return false
     },
     moveToCurrentTag() {
-      const tags = this.$refs.tag
+      const tags = this.itemRefs
+      console.log('tags:', tags)
       this.$nextTick(() => {
         for (const tag of tags) {
           if (tag.to.path === this.$route.path) {
