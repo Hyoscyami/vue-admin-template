@@ -62,6 +62,9 @@
         </div>
         <el-table
           v-loading="table.listLoading"
+          class="el-table"
+          :cell-style="cellClass"
+          :header-cell-style="headerClass"
           :data="table.tableData"
           style="width: 100%"
           border
@@ -218,6 +221,7 @@ import Pagination from '@/components/Pagination'
 import {dictConvert, isBlank, isNotEmptyCollection} from '@/utils/common'
 import {format} from '@/utils/time'
 import {DictEnum} from '@/constants/dict'
+import {CommonEnum} from '@/constants/common'
 
 export default {
   name: 'Dict',
@@ -367,7 +371,6 @@ export default {
     'tree.total'(val) {
       // 小于总数，启用滚动
       this.tree.scrollTreeDisable = this.tree.listQuery.page * this.tree.listQuery.size >= this.tree.total
-      console.log('监听到total改变，scrollTreeDisable', this.tree.scrollTreeDisable)
     }
   },
   mounted() {
@@ -414,7 +417,7 @@ export default {
         return false
       }
       this.dialog.addDialogFormVisible = true
-      this.dialog.dialogStatus = 'create'
+      this.dialog.dialogStatus = CommonEnum.create
       this.getMaxSort(this.tree.checkedNodeClick.id)
       this.dialog.addForm.parentId = this.tree.checkedNodeClick.id
     },
@@ -428,14 +431,25 @@ export default {
     addFormSubmit() {
       this.$refs['addForm'].validate((valid) => {
         if (valid) {
-          add(JSON.stringify(this.dialog.addForm)).then(response => {
-            // 关闭弹框
-            this.cancelAddForm()
-            // 刷新表格
-            this.getList()
-            // 刷新树
-            this.filterTree()
-          })
+          if (this.dialog.dialogStatus === CommonEnum.create) {
+            add(JSON.stringify(this.dialog.addForm)).then(response => {
+              // 关闭弹框
+              this.cancelAddForm()
+              // 刷新表格
+              this.getList()
+              // 刷新树
+              this.filterTree()
+            })
+          } else if (this.dialog.dialogStatus === CommonEnum.update) {
+            update(JSON.stringify(this.dialog.addForm)).then(response => {
+              // 关闭弹框
+              this.cancelAddForm()
+              // 刷新表格
+              this.getList()
+              // 刷新树
+              this.filterTree()
+            })
+          }
         } else {
           return false
         }
@@ -455,7 +469,6 @@ export default {
       this.table.listLoading = true
       this.table.listQuery.parentId = this.tree.checkedNodeClick.id
       list(this.table.listQuery).then(response => {
-        console.log('getList:response,', response)
         this.table.tableData = response.data.records
         this.table.total = response.data.total
         this.table.listLoading = false
@@ -463,7 +476,7 @@ export default {
     },
     // 修改数据字典详情
     updateDetail(row) {
-      this.dialog.dialogStatus = 'update'
+      this.dialog.dialogStatus = CommonEnum.update
       this.dialog.addDialogFormVisible = true
       Object.assign(this.dialog.addForm, row)
     },
@@ -488,7 +501,6 @@ export default {
       this.tree.checkedNodeDropdown = node
       if (node.level === 0) {
         // 最开始的时候，默认根节点被选中
-        console.log('根节点加载，this.tree.checkedNodeDropdown', this.tree.checkedNodeDropdown)
         // 默认展开第二级
         this.$nextTick(() => {
           const rootNode = node.childNodes[0]
@@ -501,13 +513,11 @@ export default {
       }
       if (node.level > 0) {
         await this.getChildrenNode(node.data.id)
-        console.log('node.level>0,node:', node)
         return resolve(this.tree.loadChildrenTreeData)
       }
     },
     // 清除node的子节点查看下一页的标识
     clearHasNext(node) {
-      console.log('clearHasNext的node', node)
       const childNodes = node.parent.childNodes
       // 取消之前下一页的链接
       const lastNode = this.$refs.tree.getNode(childNodes[childNodes.length - 1].data.id)
@@ -534,21 +544,18 @@ export default {
      * @param id 当前节点id
      */
     async getChildrenNode(id) {
-      console.log('getChildrenNode:id', id)
       // 重置查询条件
       this.resetTreeQuery()
       this.tree.listQuery.parentId = id
       await list(this.tree.listQuery).then(response => {
         this.tree.loadChildrenTreeData = response.data.records
         this.tree.total = response.data.total
-        console.log('this.tree.loadChildrenTreeData', this.tree.loadChildrenTreeData)
       })
     },
     // 节点被点击
     handleNodeClick(data, node) {
       // 保存被选择节点
       Object.assign(this.tree.checkedNodeClick, data)
-      console.log('节点被点击data:', data, 'node:', node)
       this.table.listQuery.parentId = data.id
       // 刷新表格
       this.getList()
@@ -581,7 +588,6 @@ export default {
       } else {
         param.status = 1
       }
-      console.log('param:', param)
       update(param).then(response => {
         this.$message({
           message: '操作成功',
@@ -609,6 +615,14 @@ export default {
       this.tree.listQuery.isSearch = false
       this.tree.listQuery.name = ''
       this.tree.total = 0
+    },
+    // 单元格样式
+    cellClass() {
+      return {borderColor: '#0e2231'}
+    },
+    // 表头样式
+    headerClass() {
+      return {borderColor: '#0e2231', background: '#b1b3b8', color: '#151617'}
     }
   }
 }
@@ -627,5 +641,8 @@ $bg: #283443;
   justify-content: space-between;
   font-size: 14px;
   padding-right: 8px;
+}
+.el-table{
+  border: #0e2231 solid 1px;
 }
 </style>

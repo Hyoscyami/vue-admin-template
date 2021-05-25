@@ -3,11 +3,11 @@
     <el-row :gutter="20">
       <div class="filter-container">
         <el-form ref="formInline" :model="table.listQuery" :inline="true">
-          <el-form-item label="字典值" prop="code" @keyup.enter.native="searchFormSubmit">
-            <el-input v-model="table.listQuery.code" placeholder="字典值" />
+          <el-form-item label="名称" prop="name" @keyup.enter.native="searchFormSubmit">
+            <el-input v-model="table.listQuery.name" placeholder="名称" />
           </el-form-item>
-          <el-form-item label="描述" prop="description">
-            <el-input v-model="table.listQuery.description" placeholder="描述" />
+          <el-form-item label="码值" prop="code">
+            <el-input v-model="table.listQuery.code" placeholder="码值" />
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-select v-model="table.listQuery.status" placeholder="状态">
@@ -33,12 +33,12 @@
           width="55"
         />
         <el-table-column
-          prop="code"
-          label="码值"
-        />
-        <el-table-column
           prop="name"
           label="名称"
+        />
+        <el-table-column
+          prop="code"
+          label="码值"
         />
         <el-table-column
           prop="value"
@@ -95,7 +95,7 @@
         :before-close="cancelAddForm"
       >
         <el-form ref="addForm" :model="dialog.addForm" :rules="dialog.addFormRules" label-width="80px">
-          <el-form-item label="字典名称" prop="name">
+          <el-form-item label="名称" prop="name">
             <el-input v-model="dialog.addForm.name" autocomplete="off" tabindex="1" />
           </el-form-item>
           <el-form-item label="码值" prop="code">
@@ -174,61 +174,19 @@
 </template>
 
 <script>
-import {add, del, getMaxSort, list, listChildrenByCode, update} from '@/api/sys/dict'
+import {add, del, getMaxSort, list, update} from '@/api/sys/config'
 import Pagination from '@/components/Pagination'
-import {dictConvert, isBlank, isNotEmptyCollection} from '@/utils/common'
+import {dictConvert} from '@/utils/common'
 import {format} from '@/utils/time'
 import {DictEnum} from '@/constants/dict'
+import {listChildrenByCode} from '@/api/sys/dict'
+import {CommonEnum} from '@/constants/common'
 
 export default {
-  name: 'Dict',
+  name: 'Config',
   components: {Pagination},
   data() {
     return {
-      // 树相关
-      tree: {
-        // 过滤树的字段
-        filterTreeText: '',
-        // 树滚动下拉加载状态
-        scrollLoading: false,
-        // 树的属性重命名
-        treeProps: {
-          label: 'name',
-          isLeaf: 'isLeaf'
-        },
-        // 根节点
-        rootNode: {
-          id: 0,
-          name: '数据字典',
-          parentId: 0,
-          isLeaf: false
-        },
-        // 单击被选中节点，给右侧表格列表查询使用，默认是根节点，因为mounted里会初始化表格，而tree初始化这个字段在初始化表格之后
-        checkedNodeClick: {
-          id: 0
-        },
-        // 点击下拉图标选中的节点，给树滚动加载使用
-        checkedNodeDropdown: {},
-        // 当前被点击节点懒加载子树的数据
-        loadChildrenTreeData: [],
-        // 最开始默认展开的node对应的keys
-        defaultExpandedKeys: [],
-        // tree分页查询对象
-        listQuery: {
-          page: 1,
-          limit: 20,
-          name: '',
-          isSearch: false,
-          parentId: undefined,
-          code: '',
-          description: '',
-          status: undefined
-        },
-        // 树查询结果返回节点的总数
-        total: 0,
-        // 是否能下拉加载数据
-        scrollTreeDisable: false
-      },
       // 表格
       table: {
         // 父数据字段表格数据
@@ -237,8 +195,7 @@ export default {
         listLoading: true,
         listQuery: {
           page: 1,
-          limit: 20,
-          parentId: undefined,
+          size: 20,
           isSearch: true,
           name: '',
           code: '',
@@ -281,8 +238,7 @@ export default {
           value: '',
           description: '',
           status: 1,
-          sort: 1,
-          parentId: 0
+          sort: 1
         },
         // 新增数据字典规则
         addFormRules: {
@@ -319,18 +275,6 @@ export default {
       return format(this.dialog.viewDetailData.createTime)
     }
   },
-  watch: {
-    // 搜索权限树的时候联动过滤名称符合的树
-    'tree.filterTreeText'(searchText) {
-      this.filterTree(searchText)
-    },
-    // total改变了 ，计算是否能继续滚动加载树
-    'tree.total'(val) {
-      // 小于总数，启用滚动
-      this.tree.scrollTreeDisable = this.tree.listQuery.page * this.tree.listQuery.limit >= this.tree.total
-      console.log('监听到total改变，scrollTreeDisable', this.tree.scrollTreeDisable)
-    }
-  },
   mounted() {
     // 初始化状态
     this.listStatus()
@@ -338,20 +282,6 @@ export default {
     this.searchFormSubmit()
   },
   methods: {
-    // 搜索tree
-    filterTree(searchText) {
-      // 重置树的搜索条件
-      this.resetTreeQuery()
-      if (isBlank(searchText)) {
-        this.tree.listQuery.parentId = this.tree.rootNode.id
-      }
-      this.tree.listQuery.name = searchText
-      this.tree.listQuery.isSearch = true
-      list(this.tree.listQuery).then(response => {
-        this.tree.total = response.data.total
-        this.$refs.tree.updateKeyChildren(this.tree.rootNode.id, response.data.records)
-      })
-    },
     // 搜索数据字典表单查询
     searchFormSubmit() {
       this.table.listQuery.page = 1
@@ -367,36 +297,39 @@ export default {
     },
     // 打开新增数据字典对话框
     openAddDialog() {
-      if (isBlank(this.tree.checkedNodeClick.id)) {
-        this.$message({
-          message: '请先在左侧选择节点',
-          type: 'warning'
-        })
-        return false
-      }
       this.dialog.addDialogFormVisible = true
       this.dialog.dialogStatus = 'create'
-      this.getMaxSort(this.tree.checkedNodeClick.id)
-      this.dialog.addForm.parentId = this.tree.checkedNodeClick.id
+      this.getMaxSort()
     },
     // 获取当前最大排序值
-    getMaxSort(id) {
-      getMaxSort(id).then(response => {
-        this.dialog.addForm.sort = response.data + 1
+    getMaxSort() {
+      getMaxSort().then(response => {
+        this.dialog.addForm.sort = response.data
       })
     },
     // 新增数据字典表单提交
     addFormSubmit() {
       this.$refs['addForm'].validate((valid) => {
         if (valid) {
-          add(JSON.stringify(this.dialog.addForm)).then(response => {
-            // 关闭弹框
-            this.cancelAddForm()
-            // 刷新表格
-            this.getList()
-            // 刷新树
-            this.filterTree()
-          })
+          if (this.dialog.dialogStatus === CommonEnum.create) {
+            add(JSON.stringify(this.dialog.addForm)).then(response => {
+              // 关闭弹框
+              this.cancelAddForm()
+              // 刷新表格
+              this.getList()
+              // 刷新树
+              this.filterTree()
+            })
+          } else if (this.dialog.dialogStatus === CommonEnum.update) {
+            update(JSON.stringify(this.dialog.addForm)).then(response => {
+              // 关闭弹框
+              this.cancelAddForm()
+              // 刷新表格
+              this.getList()
+              // 刷新树
+              this.filterTree()
+            })
+          }
         } else {
           return false
         }
@@ -414,7 +347,6 @@ export default {
     // 获取父数据字段列表数据
     getList() {
       this.table.listLoading = true
-      this.table.listQuery.parentId = this.tree.checkedNodeClick.id
       list(this.table.listQuery).then(response => {
         console.log('getList:response,', response)
         this.table.tableData = response.data.records
@@ -438,91 +370,6 @@ export default {
         // 刷新表格数据
         this.searchFormSubmit()
       })
-    },
-    /**
-     * 加载子树数据的方法，仅当 lazy 属性为true 时生效
-     * @param node 节点
-     * @param resolve
-     * @returns {*}
-     */
-    async loadNode(node, resolve) {
-      this.tree.checkedNodeDropdown = node
-      if (node.level === 0) {
-        // 最开始的时候，默认根节点被选中
-        console.log('根节点加载，this.tree.checkedNodeDropdown', this.tree.checkedNodeDropdown)
-        // 默认展开第二级
-        this.$nextTick(() => {
-          const rootNode = node.childNodes[0]
-          rootNode.expanded = true
-          // 默认选中根节点
-          this.$refs.tree.setCurrentKey(rootNode.id, true)
-          Object.assign(this.tree.checkedNodeClick, node)
-        }).then(r => node.childNodes[0].loadData())
-        return resolve([this.tree.rootNode])
-      }
-      if (node.level > 0) {
-        await this.getChildrenNode(node.data.id)
-        console.log('node.level>0,node:', node)
-        return resolve(this.tree.loadChildrenTreeData)
-      }
-    },
-    // 清除node的子节点查看下一页的标识
-    clearHasNext(node) {
-      console.log('clearHasNext的node', node)
-      const childNodes = node.parent.childNodes
-      // 取消之前下一页的链接
-      const lastNode = this.$refs.tree.getNode(childNodes[childNodes.length - 1].data.id)
-      lastNode.data.hasNext = false
-    },
-    // 滚动下拉树的数据
-    scrollTreeData() {
-      this.tree.listQuery.page = this.tree.listQuery.page + 1
-      this.tree.listQuery.parentId = this.tree.checkedNodeDropdown.data.id
-      list(this.tree.listQuery).then(response => {
-        this.tree.total = response.data.total
-        // 数据不为空，且滚动框未禁用
-        if (isNotEmptyCollection(response.data.records) && !this.tree.scrollTreeDisable) {
-          // 追加树节点
-          this.tree.loadChildrenTreeData = response.data.records
-          this.tree.loadChildrenTreeData.forEach(node => {
-            this.$refs.tree.append(node, this.tree.checkedNodeDropdown)
-          })
-        }
-      })
-    },
-    /**
-     * 根据id获取直接子节点
-     * @param id 当前节点id
-     */
-    async getChildrenNode(id) {
-      console.log('getChildrenNode:id', id)
-      // 重置查询条件
-      this.resetTreeQuery()
-      this.tree.listQuery.parentId = id
-      await list(this.tree.listQuery).then(response => {
-        this.tree.loadChildrenTreeData = response.data.records
-        this.tree.total = response.data.total
-        console.log('this.tree.loadChildrenTreeData', this.tree.loadChildrenTreeData)
-      })
-    },
-    // 节点被点击
-    handleNodeClick(data, node) {
-      // 保存被选择节点
-      Object.assign(this.tree.checkedNodeClick, data)
-      console.log('节点被点击data:', data, 'node:', node)
-      this.table.listQuery.parentId = data.id
-      // 刷新表格
-      this.getList()
-    },
-    // 节点被展开
-    handleNodeExpand(data) {
-      // 保存被选择节点
-      Object.assign(this.tree.checkedNodeDropdown, data)
-    },
-    // 节点被关闭
-    handleNodeCollapse(data) {
-      // 保存被选择节点，此时传当前被关闭的节点的父节点，因为当前节点被关闭，有下拉分页的需求最多是当前节点的父节点
-      Object.assign(this.tree.checkedNodeDropdown, data.parent)
     },
     // 获取状态下拉框
     listStatus() {
@@ -550,26 +397,6 @@ export default {
         })
         data.status = param.status
       })
-    },
-    // 点击下一页
-    viewNextPage(clickedNode) {
-      this.scrollTreeData()
-      // 清除之前的下一页超链接
-      this.clearHasNext(clickedNode)
-      this.tree.loadChildrenTreeData.forEach(node => {
-        this.$refs.tree.append(node, clickedNode.parent)
-      })
-    },
-    // 重置树的搜索条件
-    resetTreeQuery() {
-      this.tree.listQuery.page = 1
-      this.tree.listQuery.parentId = undefined
-      this.tree.listQuery.code = ''
-      this.tree.listQuery.description = ''
-      this.tree.listQuery.status = undefined
-      this.tree.listQuery.isSearch = false
-      this.tree.listQuery.name = ''
-      this.tree.total = 0
     }
   }
 }
