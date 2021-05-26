@@ -7,9 +7,6 @@
           placeholder="输入关键字进行过滤"
         />
         <div
-          v-infinite-scroll="scrollTreeData"
-          :infinite-scroll-disabled="tree.scrollTreeDisable"
-          :infinite-scroll-immediate="false"
           class="tree-box"
         >
           <el-tree
@@ -34,7 +31,6 @@
               </span>
             </template>
           </el-tree>
-          <p v-if="tree.scrollLoading">加载中...</p>
         </div>
       </el-col>
       <el-col :span="18">
@@ -232,8 +228,6 @@ export default {
       tree: {
         // 过滤树的字段
         filterTreeText: '',
-        // 树滚动下拉加载状态
-        scrollLoading: false,
         // 树的属性重命名
         treeProps: {
           label: 'name',
@@ -268,9 +262,7 @@ export default {
           status: undefined
         },
         // 树查询结果返回节点的总数
-        total: 0,
-        // 是否能下拉加载数据
-        scrollTreeDisable: false
+        total: 0
       },
       // 表格
       table: {
@@ -366,11 +358,6 @@ export default {
     // 搜索权限树的时候联动过滤名称符合的树
     'tree.filterTreeText'(searchText) {
       this.filterTree(searchText)
-    },
-    // total改变了 ，计算是否能继续滚动加载树
-    'tree.total'(val) {
-      // 小于总数，启用滚动
-      this.tree.scrollTreeDisable = this.tree.listQuery.page * this.tree.listQuery.size >= this.tree.total
     }
   },
   mounted() {
@@ -523,19 +510,21 @@ export default {
       const lastNode = this.$refs.tree.getNode(childNodes[childNodes.length - 1].data.id)
       lastNode.data.hasNext = false
     },
-    // 滚动下拉树的数据
-    scrollTreeData() {
+    // 加载下一页的数据
+    loadNextPageData() {
       this.tree.listQuery.page = this.tree.listQuery.page + 1
       this.tree.listQuery.parentId = this.tree.checkedNodeDropdown.data.id
       list(this.tree.listQuery).then(response => {
         this.tree.total = response.data.total
-        // 数据不为空，且滚动框未禁用
-        if (isNotEmptyCollection(response.data.records) && !this.tree.scrollTreeDisable) {
+        // 数据不为空
+        if (isNotEmptyCollection(response.data.records)) {
           // 追加树节点
           this.tree.loadChildrenTreeData = response.data.records
           this.tree.loadChildrenTreeData.forEach(node => {
             this.$refs.tree.append(node, this.tree.checkedNodeDropdown)
           })
+          // 设置最后一个节点是否有下一页链接
+          this.setHasNext()
         }
       })
     },
@@ -550,11 +539,16 @@ export default {
       await list(this.tree.listQuery).then(response => {
         this.tree.loadChildrenTreeData = response.data.records
         this.tree.total = response.data.total
-        if (isNotEmptyCollection(this.tree.loadChildrenTreeData)) {
-          const lastNode = this.tree.loadChildrenTreeData[this.tree.loadChildrenTreeData.length - 1]
-          lastNode.hasNext = this.tree.listQuery.page * this.tree.listQuery.size < this.tree.total
-        }
+        // 设置最后一个节点是否有下一页链接
+        this.setHasNext()
       })
+    },
+    // 设置最后一个节点是否有下一页链接
+    setHasNext() {
+      if (isNotEmptyCollection(this.tree.loadChildrenTreeData)) {
+        const lastNode = this.tree.loadChildrenTreeData[this.tree.loadChildrenTreeData.length - 1]
+        lastNode.hasNext = this.tree.listQuery.page * this.tree.listQuery.size < this.tree.total
+      }
     },
     // 节点被点击
     handleNodeClick(data, node) {
@@ -602,7 +596,7 @@ export default {
     },
     // 点击下一页
     viewNextPage(clickedNode) {
-      this.scrollTreeData()
+      this.loadNextPageData()
       // 清除之前的下一页超链接
       this.clearHasNext(clickedNode)
       this.tree.loadChildrenTreeData.forEach(node => {
