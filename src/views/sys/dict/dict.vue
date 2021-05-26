@@ -36,7 +36,7 @@
       <el-col :span="18">
         <div class="filter-container">
           <el-form ref="formInline" :model="table.listQuery" :inline="true">
-            <el-form-item label="字典值" prop="code" @keyup.enter.native="searchFormSubmit">
+            <el-form-item label="字典值" prop="code">
               <el-input v-model="table.listQuery.code" placeholder="字典值" />
             </el-form-item>
             <el-form-item label="描述" prop="description">
@@ -106,7 +106,7 @@
             <template #default="scope">
               <el-button type="text" size="small" @click="updateDetail(scope.row)">编辑</el-button>
               <el-popconfirm
-                title="这是一段内容确定删除吗？"
+                title="确定删除吗？"
                 @confirm="del(scope.row)"
               >
                 <template #reference>
@@ -235,14 +235,14 @@ export default {
         },
         // 根节点
         rootNode: {
-          id: 0,
+          id: 1,
           name: '数据字典',
           parentId: 0,
           isLeaf: false
         },
         // 单击被选中节点，给右侧表格列表查询使用，默认是根节点，因为mounted里会初始化表格，而tree初始化这个字段在初始化表格之后
         checkedNodeClick: {
-          id: 0
+          id: 1
         },
         // 点击下拉图标选中的节点，给树滚动加载使用
         checkedNodeDropdown: {},
@@ -599,9 +599,9 @@ export default {
       this.loadNextPageData()
       // 清除之前的下一页超链接
       this.clearHasNext(clickedNode)
-      this.tree.loadChildrenTreeData.forEach(node => {
-        this.$refs.tree.append(node, clickedNode.parent)
-      })
+      // this.tree.loadChildrenTreeData.forEach(node => {
+      //   this.$refs.tree.append(node, clickedNode.parent)
+      // })
     },
     // 重置树的搜索条件
     resetTreeQuery() {
@@ -629,7 +629,7 @@ export default {
 <style lang="scss" scoped>
 $bg: #283443;
 .tree-box {
-  height: 400px;
+  height: 1300px;
   overflow: auto;
 }
 .custom-tree-node {
