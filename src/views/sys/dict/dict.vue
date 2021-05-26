@@ -550,6 +550,10 @@ export default {
       await list(this.tree.listQuery).then(response => {
         this.tree.loadChildrenTreeData = response.data.records
         this.tree.total = response.data.total
+        if (isNotEmptyCollection(this.tree.loadChildrenTreeData)) {
+          const lastNode = this.tree.loadChildrenTreeData[this.tree.loadChildrenTreeData.length - 1]
+          lastNode.hasNext = this.tree.listQuery.page * this.tree.listQuery.size < this.tree.total
+        }
       })
     },
     // 节点被点击
@@ -622,7 +626,7 @@ export default {
     },
     // 表头样式
     headerClass() {
-      return {borderColor: '#0e2231', background: '#6b7ca7', color: '#151617'}
+      return {borderColor: '#0e2231', background: '#b1b3b8', color: '#151617'}
     }
   }
 }
