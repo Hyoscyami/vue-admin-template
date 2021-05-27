@@ -36,11 +36,11 @@
       <el-col :span="18">
         <div class="filter-container">
           <el-form ref="formInline" :model="table.listQuery" :inline="true">
-            <el-form-item label="字典值" prop="code">
-              <el-input v-model="table.listQuery.code" placeholder="字典值" />
+            <el-form-item label="名称" prop="description">
+              <el-input v-model="table.listQuery.name" placeholder="模糊查询名称" />
             </el-form-item>
-            <el-form-item label="描述" prop="description">
-              <el-input v-model="table.listQuery.description" placeholder="描述" />
+            <el-form-item label="码值" prop="code">
+              <el-input v-model="table.listQuery.code" placeholder="精确查询码值" />
             </el-form-item>
             <el-form-item label="状态" prop="status">
               <el-select v-model="table.listQuery.status" placeholder="状态" clearable>
@@ -494,7 +494,7 @@ export default {
           rootNode.expanded = true
           // 默认选中根节点
           this.$refs.tree.setCurrentKey(rootNode.id, true)
-          Object.assign(this.tree.checkedNodeClick, node)
+          Object.assign(this.tree.checkedNodeClick, rootNode)
         }).then(r => node.childNodes[0].loadData())
         return resolve([this.tree.rootNode])
       }
