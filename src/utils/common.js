@@ -1,4 +1,5 @@
 import {listChildrenByCode} from '@/api/sys/dict'
+import {ElMessage} from 'element-plus'
 
 /**
  * 是否为空集合
@@ -42,4 +43,18 @@ export function dictConvert(code, value) {
     console.log('value:', value)
   })
   return value
+}
+// 安装msg文案提示成功
+export function successMsg(msg) {
+  ElMessage.success({
+    message: msg,
+    type: 'success'
+  })
+}
+// 安装msg文案提示警告
+export function warningMsg(msg) {
+  ElMessage.warning({
+    message: msg,
+    type: 'warring'
+  })
 }

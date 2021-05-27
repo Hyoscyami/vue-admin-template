@@ -255,11 +255,12 @@ export default {
           page: 1,
           size: 100,
           name: '',
-          isSearch: false,
           parentId: undefined,
           code: '',
           description: '',
-          status: undefined
+          status: undefined,
+          minDistance: undefined,
+          maxDistance: undefined
         },
         // 树查询结果返回节点的总数
         total: 0
@@ -274,7 +275,6 @@ export default {
           page: 1,
           size: 20,
           parentId: undefined,
-          isSearch: true,
           name: '',
           code: '',
           description: '',
@@ -375,7 +375,6 @@ export default {
         this.tree.listQuery.parentId = this.tree.rootNode.id
       }
       this.tree.listQuery.name = searchText
-      this.tree.listQuery.isSearch = true
       list(this.tree.listQuery).then(response => {
         this.tree.total = response.data.total
         this.$refs.tree.updateKeyChildren(this.tree.rootNode.id, response.data.records)
@@ -411,7 +410,7 @@ export default {
     // 获取当前最大排序值
     getMaxSort(id) {
       getMaxSort(id).then(response => {
-        this.dialog.addForm.sort = response.data + 1
+        this.dialog.addForm.sort = response.data
       })
     },
     // 新增数据字典表单提交
@@ -514,6 +513,8 @@ export default {
     loadNextPageData() {
       this.tree.listQuery.page = this.tree.listQuery.page + 1
       this.tree.listQuery.parentId = this.tree.checkedNodeDropdown.data.id
+      this.tree.listQuery.minDistance = 1
+      this.tree.listQuery.maxDistance = 1
       list(this.tree.listQuery).then(response => {
         this.tree.total = response.data.total
         // 数据不为空
@@ -536,6 +537,8 @@ export default {
       // 重置查询条件
       this.resetTreeQuery()
       this.tree.listQuery.parentId = id
+      this.tree.listQuery.minDistance = 1
+      this.tree.listQuery.maxDistance = 1
       await list(this.tree.listQuery).then(response => {
         this.tree.loadChildrenTreeData = response.data.records
         this.tree.total = response.data.total
@@ -610,9 +613,10 @@ export default {
       this.tree.listQuery.code = ''
       this.tree.listQuery.description = ''
       this.tree.listQuery.status = undefined
-      this.tree.listQuery.isSearch = false
       this.tree.listQuery.name = ''
       this.tree.total = 0
+      this.tree.listQuery.minDistance = 1
+      this.tree.listQuery.maxDistance = 1
     },
     // 单元格样式
     cellClass() {
