@@ -1,19 +1,5 @@
 import request from '@/utils/request'
 
-export function getRootPermission() {
-  return request({
-    url: '/permission/getRootPermission',
-    method: 'get'
-  })
-}
-
-export function listChildren(id) {
-  return request({
-    url: '/permission/listChildren',
-    method: 'get',
-    params: {id}
-  })
-}
 export function add(data) {
   return request({
     url: '/permission/add',
@@ -41,14 +27,10 @@ export function getMaxSort(id) {
   })
 }
 
-export function list(data) {
+export function getTree() {
   return request({
-    url: '/permission/list',
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json;charset=UTF-8'
-    },
-    data
+    url: '/permission/tree',
+    method: 'get'
   })
 }
 export function update(data) {
