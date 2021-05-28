@@ -9,6 +9,11 @@
         <el-tree :data="tree.data" :props="tree.props" empty-text="数据加载中" @node-click="handleNodeClick" />
       </el-col>
       <el-col :span="16">
+        <el-form-item>
+          <el-button type="primary">新增</el-button>
+          <el-button type="primary">编辑</el-button>
+          <el-button type="danger">删除</el-button>
+        </el-form-item>
         <el-form ref="form" :model="checkedNode" label-width="80px">
           <el-form-item label="权限名称" prop="name">
             <el-input v-model="checkedNode.name" />
@@ -42,7 +47,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="save">保存</el-button>
+            <el-button type="primary" @click="save">提交</el-button>
             <el-button>取消</el-button>
           </el-form-item>
         </el-form>
