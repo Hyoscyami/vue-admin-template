@@ -422,7 +422,7 @@ export default {
               // 刷新表格
               this.getList()
               // 刷新树
-              this.filterTree()
+              this.$refs.tree.append(response.data, this.tree.checkedNodeClick)
             })
           } else if (this.dialog.dialogStatus === CommonEnum.update) {
             update(JSON.stringify(this.dialog.addForm)).then(response => {

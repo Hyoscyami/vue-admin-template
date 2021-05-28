@@ -23,8 +23,11 @@
               />
             </el-select>
           </el-form-item>
+          <el-form-item label="路径" prop="path">
+            <el-input v-model="checkedNode.path" />
+          </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="save">立即创建</el-button>
+            <el-button type="primary" @click="save">保存</el-button>
             <el-button>取消</el-button>
           </el-form-item>
         </el-form>

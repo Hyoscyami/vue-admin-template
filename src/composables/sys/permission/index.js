@@ -30,7 +30,7 @@ export const checkedNode = reactive({
   id: undefined,
   parentId: undefined,
   name: '',
-  type: undefined,
+  type: '',
   path: '',
   component: '',
   icon: '',
