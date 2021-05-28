@@ -36,7 +36,7 @@ export const checkedNode = reactive({
   icon: '',
   hidden: false,
   sort: undefined,
-  status: undefined
+  status: ''
 })
 // 初始化树
 export function initTree() {
@@ -47,11 +47,7 @@ export function initTree() {
 // 节点被点击
 export function handleNodeClick(node) {
   Object.assign(checkedNode, node)
-  checkedNode.type = '1'
-  // 初始化权限图标
-  listChildrenByCode(DictEnum.PermissionIcon).then(response => {
-    tree.iconSelect = response.data
-  })
+  console.log('checkedNode', checkedNode)
 }
 // 初始化statusSelect
 export function initStatusSelect() {
@@ -63,6 +59,12 @@ export function initStatusSelect() {
 export function initTypeSelect() {
   listChildrenByCode(DictEnum.PermissionTypes).then(response => {
     tree.typeSelect = response.data
+  })
+}
+// 初始化权限图标
+export function initIconSelect() {
+  listChildrenByCode(DictEnum.PermissionIcon).then(response => {
+    tree.iconSelect = response.data
   })
 }
 // 保存被选择的节点
@@ -83,4 +85,6 @@ export function init() {
   initStatusSelect()
   // 初始化权限类型
   initTypeSelect()
+  // 初始化权限图标
+  initIconSelect()
 }

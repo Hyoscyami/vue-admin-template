@@ -26,6 +26,21 @@
           <el-form-item label="路径" prop="path">
             <el-input v-model="checkedNode.path" />
           </el-form-item>
+          <el-form-item label="图标" prop="icon">
+            <el-select v-model="checkedNode.icon" placeholder="请选择图标类型" clearable>
+              <el-option
+                v-for="item in tree.iconSelect"
+                :key="item.id"
+                :label="item.name"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="状态" prop="status">
+            <el-radio-group v-model="checkedNode.status">
+              <el-radio v-for="item in tree.statusSelect" :key="item.id" :label="item.value">{{ item.name }}</el-radio>
+            </el-radio-group>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="save">保存</el-button>
             <el-button>取消</el-button>
