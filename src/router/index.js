@@ -62,25 +62,25 @@ export const constantRoutes = [
       {
         path: 'org',
         name: 'Org',
-        component: () => import('@/views/sys/org/org'),
+        component: () => import('@/views/sys/org'),
         meta: {title: '组织管理', icon: 'table'}
       },
       {
         path: 'permission',
         name: 'Permission',
-        component: () => import('@/views/sys/permission/permission'),
+        component: () => import('@/views/sys/permission'),
         meta: {title: '权限管理', icon: 'tree'}
       },
       {
         path: 'dict',
         name: 'Dict',
-        component: () => import('@/views/sys/dict/dict'),
+        component: () => import('@/views/sys/dict'),
         meta: {title: '字典管理', icon: 'table'}
       },
       {
         path: 'config',
         name: 'Config',
-        component: () => import('@/views/sys/config/config'),
+        component: () => import('@/views/sys/config'),
         meta: {title: '系统设置', icon: 'table'}
       }
     ]

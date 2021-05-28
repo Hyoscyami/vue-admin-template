@@ -15,7 +15,12 @@
           </el-form-item>
           <el-form-item label="权限类型" prop="type">
             <el-select v-model="checkedNode.type" placeholder="请选择权限类型" clearable>
-              <el-option v-for="item in checkedNode.statusSelect" :key="item.id" :label="item.name" :value="item.value" />
+              <el-option
+                v-for="item in checkedNode.statusSelect"
+                :key="item.id"
+                :label="item.name"
+                :value="item.value"
+              />
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -30,7 +35,7 @@
 
 <script>
 
-import {initTree, handleNodeClick, tree, checkedNode, save} from '@/composables/sys/permission/permission'
+import {initTree, handleNodeClick, tree, checkedNode, save} from '@/composables/sys/permission'
 
 export default {
   name: 'Permission',
@@ -53,6 +58,7 @@ $bg: #283443;
   height: 400px;
   overflow: auto;
 }
+
 .custom-tree-node {
   flex: 1;
   display: flex;
