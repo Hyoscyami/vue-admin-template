@@ -19,7 +19,7 @@
                 v-for="item in tree.typeSelect"
                 :key="item.id"
                 :label="item.name"
-                :value="item.value"
+                :value="Number(item.value)"
               />
             </el-select>
           </el-form-item>
@@ -32,13 +32,13 @@
                 v-for="item in tree.iconSelect"
                 :key="item.id"
                 :label="item.name"
-                :value="item.value"
+                :value="Number(item.value)"
               />
             </el-select>
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="checkedNode.status">
-              <el-radio v-for="item in tree.statusSelect" :key="item.id" :label="item.value">{{ item.name }}</el-radio>
+              <el-radio v-for="item in tree.statusSelect" :key="item.id" :label="Number(item.value)">{{ item.name }}</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item>
