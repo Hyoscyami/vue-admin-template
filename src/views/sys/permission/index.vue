@@ -16,7 +16,7 @@
           <el-form-item label="权限类型" prop="type">
             <el-select v-model="checkedNode.type" placeholder="请选择权限类型" clearable>
               <el-option
-                v-for="item in checkedNode.statusSelect"
+                v-for="item in tree.typeSelect"
                 :key="item.id"
                 :label="item.name"
                 :value="item.value"
@@ -35,13 +35,13 @@
 
 <script>
 
-import {initTree, handleNodeClick, tree, checkedNode, save} from '@/composables/sys/permission'
+import {checkedNode, handleNodeClick, init, save, tree} from '@/composables/sys/permission'
 
 export default {
   name: 'Permission',
   setup() {
-    // 初始化树
-    initTree()
+    // 初始化
+    init()
     return {
       tree,
       checkedNode,

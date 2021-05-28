@@ -214,7 +214,7 @@
 <script>
 import {add, del, getMaxSort, list, listChildrenByCode, update} from '@/api/sys/dict'
 import Pagination from '@/components/Pagination'
-import {dictConvert, isBlank, isNotEmptyCollection} from '@/utils/common'
+import {dictConvert, isBlank, isNotEmptyCollection, warningMsg} from '@/utils/common'
 import {format} from '@/utils/time'
 import {DictEnum} from '@/constants/dict'
 import {CommonEnum} from '@/constants/common'
@@ -396,21 +396,19 @@ export default {
     // 打开新增数据字典对话框
     openAddDialog() {
       if (isBlank(this.tree.checkedNodeClick.id)) {
-        this.$message({
-          message: '请先在左侧选择节点',
-          type: 'warning'
-        })
+        warningMsg('请先在左侧选择节点')
         return false
       }
       this.dialog.addDialogFormVisible = true
       this.dialog.dialogStatus = CommonEnum.create
       this.getMaxSort(this.tree.checkedNodeClick.id)
       this.dialog.addForm.parentId = this.tree.checkedNodeClick.id
+      this.dialog.addForm.code = this.tree.checkedNodeClick.code
     },
     // 获取当前最大排序值
     getMaxSort(id) {
       getMaxSort(id).then(response => {
-        this.dialog.addForm.sort = response.data
+        this.dialog.addForm.sort = response.data + 1
       })
     },
     // 新增数据字典表单提交

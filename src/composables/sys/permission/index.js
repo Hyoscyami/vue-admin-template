@@ -1,6 +1,8 @@
 import {reactive} from 'vue'
 import {getTree, update} from '@/api/sys/permission'
 import {successMsg, warningMsg} from '@/utils/common'
+import {listChildrenByCode} from '@/api/sys/dict'
+import {DictEnum} from '@/constants/dict'
 // 树相关
 export const tree = reactive({
   // 搜索树的名称
@@ -45,7 +47,23 @@ export function initTree() {
 // 节点被点击
 export function handleNodeClick(node) {
   Object.assign(checkedNode, node)
-  console.log('我被打印了:', checkedNode)
+  checkedNode.type = '1'
+  // 初始化权限图标
+  listChildrenByCode(DictEnum.PermissionIcon).then(response => {
+    tree.iconSelect = response.data
+  })
+}
+// 初始化statusSelect
+export function initStatusSelect() {
+  listChildrenByCode(DictEnum.DictStatus).then(response => {
+    tree.statusSelect = response.data
+  })
+}
+// 初始化权限类型
+export function initTypeSelect() {
+  listChildrenByCode(DictEnum.PermissionTypes).then(response => {
+    tree.typeSelect = response.data
+  })
 }
 // 保存被选择的节点
 export function save() {
@@ -56,4 +74,13 @@ export function save() {
   update(checkedNode).then(response => {
     successMsg('编辑成功')
   })
+}
+// 初始化
+export function init() {
+  // 初始化树
+  initTree()
+  // 初始化status
+  initStatusSelect()
+  // 初始化权限类型
+  initTypeSelect()
 }

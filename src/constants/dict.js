@@ -1,3 +1,5 @@
 export const DictEnum = Object.freeze({
-  DictStatus: 'sys:status'
+  DictStatus: 'sys:status',
+  PermissionTypes: 'permission:type',
+  PermissionIcon: 'permission:icon'
 })
