@@ -6,20 +6,29 @@
           v-model="tree.filterTreeText"
           placeholder="输入关键字进行过滤"
         />
-        <el-tree :data="tree.data" :props="tree.props" empty-text="数据加载中" @node-click="handleNodeClick" />
+        <el-tree
+          ref="treeRef"
+          :data="tree.data"
+          :props="tree.props"
+          node-key="id"
+          :highlight-current="true"
+          empty-text="数据加载中"
+          @node-click="handleNodeClick"
+        />
       </el-col>
       <el-col :span="16">
-        <el-form-item>
-          <el-button type="primary">新增</el-button>
-          <el-button type="primary">编辑</el-button>
-          <el-button type="danger">删除</el-button>
-        </el-form-item>
-        <el-form ref="form" :model="checkedNode" label-width="80px">
+        <el-form>
+          <el-form-item>
+            <el-button type="primary" @click="handleAddClick">新增</el-button>
+            <el-button type="danger">删除</el-button>
+          </el-form-item>
+        </el-form>
+        <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
           <el-form-item label="权限名称" prop="name">
-            <el-input v-model="checkedNode.name" />
+            <el-input v-model="form.name" />
           </el-form-item>
           <el-form-item label="权限类型" prop="type">
-            <el-select v-model="checkedNode.type" placeholder="请选择权限类型" clearable>
+            <el-select v-model="form.type" placeholder="请选择权限类型" clearable>
               <el-option
                 v-for="item in tree.typeSelect"
                 :key="item.id"
@@ -29,20 +38,23 @@
             </el-select>
           </el-form-item>
           <el-form-item label="路径" prop="path">
-            <el-input v-model="checkedNode.path" />
+            <el-input v-model="form.path" />
+          </el-form-item>
+          <el-form-item label="排序值" prop="sort">
+            <el-input v-model="form.sort" />
           </el-form-item>
           <el-form-item label="图标" prop="icon">
-            <el-select v-model="checkedNode.icon" placeholder="请选择图标类型" clearable>
+            <el-select v-model="form.icon" placeholder="请选择图标类型" clearable>
               <el-option
                 v-for="item in tree.iconSelect"
                 :key="item.id"
                 :label="item.name"
-                :value="Number(item.value)"
+                :value="item.value"
               />
             </el-select>
           </el-form-item>
           <el-form-item label="状态" prop="status">
-            <el-radio-group v-model="checkedNode.status">
+            <el-radio-group v-model="form.status">
               <el-radio v-for="item in tree.statusSelect" :key="item.id" :label="Number(item.value)">{{ item.name }}</el-radio>
             </el-radio-group>
           </el-form-item>
@@ -58,7 +70,17 @@
 
 <script>
 
-import {checkedNode, handleNodeClick, init, save, tree} from '@/composables/sys/permission'
+import {
+  form,
+  handleNodeClick,
+  init,
+  save,
+  tree,
+  treeRef,
+  rules,
+  handleAddClick,
+  formRef
+} from '@/composables/sys/permission'
 
 export default {
   name: 'Permission',
@@ -67,9 +89,13 @@ export default {
     init()
     return {
       tree,
-      checkedNode,
+      rules,
+      form,
+      treeRef,
       handleNodeClick,
-      save
+      save,
+      handleAddClick,
+      formRef
     }
   }
 }
