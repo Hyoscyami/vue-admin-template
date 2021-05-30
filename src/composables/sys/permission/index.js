@@ -1,5 +1,5 @@
 import {reactive, ref} from 'vue'
-import {add, getMaxSort, getTree} from '@/api/sys/permission'
+import {add, getMaxSort, getTree, update} from '@/api/sys/permission'
 import {successMsg, warningMsg} from '@/utils/common'
 import {listChildrenByCode} from '@/api/sys/dict'
 import {DictEnum} from '@/constants/dict'
@@ -126,21 +126,18 @@ export function save() {
   }
   formRef.value.validate((valid) => {
     if (valid) {
+      console.log('tree.formStatus', tree)
       if (CommonEnum.create === tree.formStatus) {
         add(form).then(response => {
           successMsg('新增成功')
-          treeRef.append(response.data, checkedNode)
+          treeRef.value.append(response.data, checkedNode)
         })
       } else if (CommonEnum.update === tree.formStatus) {
-        console.log('treeRef:', treeRef)
-        const node = treeRef.getNode(checkedNode.id)
-        // Object.assign(node, unref(form))
-        console.log('node:', node)
-        // update(form).then(response => {
-        //   successMsg('编辑成功')
-        //   const node = treeRef.getNode(checkedNode.id)
-        //   Object.assign(node, form)
-        // })
+        update(form).then(response => {
+          successMsg('编辑成功')
+          const node = treeRef.value.getNode(checkedNode.id)
+          Object.assign(node.data, form)
+        })
       }
     } else {
       return false
@@ -169,7 +166,7 @@ export function init() {
 
 // 点击新增
 export function handleAddClick() {
-  form.status = CommonEnum.create
+  tree.formStatus = CommonEnum.create
   if (!canSubmit()) {
     return
   }

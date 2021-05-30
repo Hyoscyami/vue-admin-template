@@ -11,6 +11,7 @@
           :data="tree.data"
           :props="tree.props"
           node-key="id"
+          :expand-on-click-node="false"
           :highlight-current="true"
           empty-text="数据加载中"
           @node-click="handleNodeClick"
