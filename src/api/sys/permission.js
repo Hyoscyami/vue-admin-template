@@ -43,3 +43,10 @@ export function update(data) {
     data
   })
 }
+
+export function getPermissions() {
+  return request({
+    url: '/operator/getPermissions',
+    method: 'get'
+  })
+}

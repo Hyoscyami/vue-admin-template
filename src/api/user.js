@@ -26,3 +26,4 @@ export function logout() {
 export function getCaptcha() {
   return request({url: '/getCaptcha', method: 'get'})
 }
+
