@@ -20,7 +20,6 @@ const mutations = {
 function convertRoute(routes, data) {
   console.log('开始转换路由:routes,data:', routes, data)
   data.forEach(item => {
-    // 根节点不在导航栏显示
     const menu = {
       path: item.path,
       component: isNotEmptyCollection(item.children) ? Layout : (resolve) => require([`@/views${item.path}`], resolve),
@@ -40,7 +39,8 @@ const actions = {
   generateRoutes({commit}) {
     return new Promise(resolve => {
       getPermissions().then(response => {
-        const loadMenuData = response.data
+        // 根节点不显示
+        const loadMenuData = response.data[0].children
         // 转换成vue需要的路由格式
         console.log('asyncRoutes', asyncRoutes)
         // 清空之前的路由
