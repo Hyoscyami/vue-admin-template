@@ -20,7 +20,7 @@
       <el-col :span="16">
         <el-form>
           <el-form-item>
-            <el-button v-if="checkPermission('/sys/permission/add')" type="primary" @click="handleAddClick">新增</el-button>
+            <el-button v-if="hasPermission('/sys/permission/add')" type="primary" @click="handleAddClick">新增</el-button>
             <el-button type="danger">删除</el-button>
           </el-form-item>
         </el-form>
@@ -98,7 +98,7 @@ export default {
       save,
       handleAddClick,
       formRef,
-      checkPermission: hasPermission
+      hasPermission
     }
   }
 }
