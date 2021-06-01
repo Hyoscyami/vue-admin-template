@@ -25,7 +25,7 @@ function convertRoute(routes, data) {
       component: isNotEmptyCollection(item.children) ? Layout : (resolve) => require([`@/views${item.path}`], resolve),
       name: item.name,
       hidden: item.hidden,
-      meta: {title: item.name, icon: item.icon},
+      meta: {title: item.name, icon: item.icon, type: item.type},
       children: []
     }
     if (item.children) {
