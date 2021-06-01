@@ -1,5 +1,7 @@
-import {constantRoutes} from '@/router'
+import {asyncRoutes} from '@/router'
 import {getPermissions} from '@/api/sys/permission'
+import Layout from '@/layout'
+import {isNotEmptyCollection} from '@/utils/common'
 
 const state = {
   routes: [],
@@ -9,28 +11,43 @@ const state = {
 const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes
-    state.routes = constantRoutes.concat(routes)
+    // state.routes = constantRoutes.concat(routes)
+    state.routes = routes
   }
 }
+
 // 后台返回的权限列表转路由列表格式
-function convertRoute(data) {
-  const routes = []
-  data.foreach(item => {
-    const route = {
+function convertRoute(routes, data) {
+  console.log('开始转换路由:routes,data:', routes, data)
+  data.forEach(item => {
+    // 根节点不在导航栏显示
+    const menu = {
       path: item.path,
-      component: () => import('@/views' + item.path),
-      hidden: item.hidden
+      component: isNotEmptyCollection(item.children) ? Layout : (resolve) => require([`@/views${item.path}`], resolve),
+      name: item.name,
+      hidden: item.hidden,
+      meta: {title: item.name},
+      children: []
     }
-    routes.push(route)
+    if (item.children) {
+      convertRoute(menu.children, item.children)
+    }
+    routes.push(menu)
   })
-  return routes
 }
+
 const actions = {
-  generateRoutes({ commit }) {
+  generateRoutes({commit}) {
     return new Promise(resolve => {
       getPermissions().then(response => {
-        const accessedRoutes = response.data
-        commit('SET_ROUTES', convertRoute(accessedRoutes))
+        const loadMenuData = response.data
+        // 转换成vue需要的路由格式
+        console.log('asyncRoutes', asyncRoutes)
+        // 清空之前的路由
+        asyncRoutes.length = 0
+        convertRoute(asyncRoutes, loadMenuData)
+        const accessedRoutes = asyncRoutes
+        commit('SET_ROUTES', accessedRoutes)
         resolve(accessedRoutes)
       })
     })

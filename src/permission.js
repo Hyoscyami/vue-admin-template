@@ -28,6 +28,8 @@ router.beforeEach(async(to, from, next) => {
       try {
         // get user info
         await store.dispatch('user/getInfo')
+        // generate routes
+        await store.dispatch('permission/generateRoutes')
         next()
       } catch (error) {
         // remove token and go to login page to re-login

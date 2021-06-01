@@ -46,7 +46,7 @@ export function update(data) {
 
 export function getPermissions() {
   return request({
-    url: '/operator/getPermissions',
+    url: '/permission/getByToken',
     method: 'get'
   })
 }
