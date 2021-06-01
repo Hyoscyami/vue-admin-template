@@ -40,11 +40,6 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/401',
-    component: () => import('@/views/error/401'),
-    hidden: true
-  },
-  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
@@ -88,6 +83,12 @@ export const constantRoutes = [
         meta: {title: '系统设置', icon: 'table'}
       }
     ]
+  },
+  {
+    path: '/401',
+    component: () => import('@/views/error/401'),
+    hidden: true,
+    name: 'Page401'
   },
   // 404 page must be placed at the end !!!
   {path: '/:catchAll(.*)', redirect: '/404', hidden: true}

@@ -4,11 +4,12 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
-import checkPermission from '@/utils/permission'
+import hasPermission from '@/utils/permission'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['/login'] // no redirect whitelist
+const errorList = ['/401'] // 错误页面
 
 router.beforeEach(async(to, from, next) => {
   // start progress bar
@@ -21,7 +22,10 @@ router.beforeEach(async(to, from, next) => {
   const hasToken = getToken()
 
   if (hasToken) {
-    if (to.path === '/login') {
+    if (errorList.indexOf(to.path) !== -1) {
+      console.log('跳转到错误页面:', to)
+      next()
+    } else if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })
       NProgress.done()
@@ -31,12 +35,13 @@ router.beforeEach(async(to, from, next) => {
         await store.dispatch('user/getInfo')
         // generate routes
         await store.dispatch('permission/generateRoutes')
-        // // 没有权限
-        // if (!checkPermission(to.path)) {
-        //   next({ path: '/401' })
-        //   NProgress.done()
-        // }
-        next()
+        // 没有权限
+        if (!hasPermission(to.path)) {
+          console.log('to', to)
+          next({ path: '/401' })
+        } else {
+          next()
+        }
       } catch (error) {
         // remove token and go to login page to re-login
         await store.dispatch('user/resetToken')

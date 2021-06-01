@@ -82,7 +82,7 @@ import {
   handleAddClick,
   formRef
 } from '@/composables/sys/permission'
-import checkPermission from '@/utils/permission'
+import hasPermission from '@/utils/permission'
 
 export default {
   name: 'Permission',
@@ -98,7 +98,7 @@ export default {
       save,
       handleAddClick,
       formRef,
-      checkPermission
+      checkPermission: hasPermission
     }
   }
 }

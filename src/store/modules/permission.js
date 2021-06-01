@@ -47,7 +47,6 @@ function convertRoute(routes, data) {
  * @param routeList list
  */
 function convertRouteList(treeRoutes, routeList) {
-  console.log('树转list:', treeRoutes, routeList)
   treeRoutes.forEach(item => {
     if (item.children) {
       convertRouteList(item.children, routeList)

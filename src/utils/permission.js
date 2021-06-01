@@ -5,6 +5,6 @@ import store from '@/store'
  * @returns {Boolean}
  * @example see @/views/permission/directive.vue
  */
-export default function checkPermission(path) {
+export default function hasPermission(path) {
   return store.getters.permissionListRoutes.some(item => item.path === path)
 }
