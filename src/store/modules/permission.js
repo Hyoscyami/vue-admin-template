@@ -2,6 +2,7 @@ import {asyncRoutes} from '@/router'
 import {getPermissions} from '@/api/sys/permission'
 import Layout from '@/layout'
 import {isNotEmptyCollection} from '@/utils/common'
+import {CommonEnum} from '@/constants/common'
 
 const state = {
   routes: [],
@@ -24,7 +25,7 @@ function convertRoute(routes, data) {
       path: item.path,
       component: isNotEmptyCollection(item.children) ? Layout : (resolve) => require([`@/views${item.path}`], resolve),
       name: item.name,
-      hidden: item.hidden,
+      hidden: item.type === CommonEnum.permissionMenu ? item.hidden : true, // 是页面的话根据按钮是否隐藏赋值，不是页面的话直接隐藏
       meta: {title: item.name, icon: item.icon, type: item.type},
       children: []
     }
