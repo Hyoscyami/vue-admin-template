@@ -32,7 +32,7 @@ export default {
       'sidebar'
     ]),
     routes() {
-      return store.getters.permission_routes.filter(item => item.meta.type === 1)
+      return store.getters.permissionTreeRoutes.filter(item => item.meta.type === 1)
       // return this.$router.options.routes
     },
     activeMenu() {
