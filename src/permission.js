@@ -4,6 +4,7 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
+import checkPermission from '@/utils/permission'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -30,6 +31,11 @@ router.beforeEach(async(to, from, next) => {
         await store.dispatch('user/getInfo')
         // generate routes
         await store.dispatch('permission/generateRoutes')
+        // // 没有权限
+        // if (!checkPermission(to.path)) {
+        //   next({ path: '/401' })
+        //   NProgress.done()
+        // }
         next()
       } catch (error) {
         // remove token and go to login page to re-login
