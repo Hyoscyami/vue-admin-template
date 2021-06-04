@@ -10,6 +10,7 @@
           ref="treeRef"
           :data="tree.data"
           :props="tree.props"
+          :default-expanded-keys="tree.defaultExpandedKeys"
           node-key="id"
           :expand-on-click-node="false"
           :highlight-current="true"
@@ -20,7 +21,7 @@
       <el-col :span="16">
         <el-form>
           <el-form-item>
-            <el-button v-if="hasPermission('/sys/permission/add')" type="primary" @click="handleAddClick">新增</el-button>
+            <el-button type="primary" @click="handleAddClick">新增</el-button>
             <el-button type="danger">删除</el-button>
           </el-form-item>
         </el-form>

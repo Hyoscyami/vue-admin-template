@@ -14,6 +14,8 @@ export const tree = reactive({
     label: 'name',
     isLeaf: 'isLeaf'
   },
+  // 默认展开key
+  defaultExpandedKeys: [],
   // 可选权限类型，下拉框使用
   typeSelect: [],
   // 可选组件，下拉框使用
@@ -88,6 +90,7 @@ export const formRef = ref(null)
 export function initTree() {
   getTree().then(response => {
     tree.data = response.data
+    tree.defaultExpandedKeys.push(tree.data[0].id)
   })
 }
 
