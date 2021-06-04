@@ -156,15 +156,16 @@ export function searchFormSubmit() {
 
 // 搜索tree
 export function filterTree(searchText) {
+  if (isBlank(searchText)) {
+    return
+  }
   // 重置树的搜索条件
   resetTreeQuery()
-  if (isBlank(searchText)) {
-    Object.assign(tree.listQuery.parentId, tree.rootNode.id)
-  }
+  tree.listQuery.parentId = toRaw(tree).rootNode.id
   tree.listQuery.name = searchText
   list(tree.listQuery).then(response => {
     tree.total = response.data.total
-    treeRef.value.updateKeyChildren(tree.rootNode.id, response.data.records)
+    treeRef.value.updateKeyChildren(toRaw(tree).rootNode.id, response.data.records)
   })
 }
 
@@ -382,7 +383,7 @@ export function resetTreeQuery() {
   tree.listQuery.name = ''
   tree.total = 0
   tree.listQuery.minDistance = 1
-  tree.listQuery.maxDistance = 1
+  tree.listQuery.maxDistance = undefined
 }
 // 表格的搜索表单重置
 export function resetSearchForm() {
