@@ -44,14 +44,14 @@ export function dictConvert(code, value) {
   })
   return value
 }
-// 安装msg文案提示成功
+// 封装msg文案提示成功
 export function successMsg(msg) {
   ElMessage.success({
     message: msg,
     type: 'success'
   })
 }
-// 安装msg文案提示警告
+// 封装msg文案提示警告
 export function warningMsg(msg) {
   ElMessage.warning({
     message: msg,
