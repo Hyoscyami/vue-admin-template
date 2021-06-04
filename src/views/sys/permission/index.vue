@@ -21,8 +21,8 @@
       <el-col :span="16">
         <el-form>
           <el-form-item>
-            <el-button type="primary" @click="handleAddClick">新增</el-button>
-            <el-button type="danger">删除</el-button>
+            <el-button v-if="hasPermission('/sys/permission/add')" type="primary" @click="handleAddClick">新增</el-button>
+            <el-button v-if="hasPermission('/sys/permission/delete')" type="danger">删除</el-button>
           </el-form-item>
         </el-form>
         <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
