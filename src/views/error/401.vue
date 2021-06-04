@@ -14,7 +14,7 @@
         </div>
         <div class="bullshit__headline">{{ message }}</div>
         <div class="bullshit__info">Please check that the URL you entered is correct, or click the button below to return to the homepage.</div>
-        <a href="/dashboard" class="bullshit__return-home">Back to home</a>
+        <a href="javascript:void(0)" class="bullshit__return-home" @click="goBack">返回上一页</a>
       </div>
     </div>
   </div>
@@ -27,6 +27,11 @@ export default {
   computed: {
     message() {
       return '暂无权限'
+    }
+  },
+  methods: {
+    goBack() {
+      this.$router.back()
     }
   }
 }

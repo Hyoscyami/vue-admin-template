@@ -90,20 +90,31 @@ export const constantRoutes = [
     hidden: true,
     name: 'Page401'
   },
+  {
+    path: '/redirect',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/redirect/:path(.*)',
+        component: () => import('@/views/redirect/index')
+      }
+    ]
+  },
   // 404 page must be placed at the end !!!
   {path: '/:catchAll(.*)', redirect: '/404', hidden: true}
 ]
+export const asyncRoutes = []
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: constantRoutes
+  routes: constantRoutes.concat(asyncRoutes)
 })
-export const asyncRoutes = []
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
   const newRouter = createRouter({
     history: createWebHistory(),
-    routes: constantRoutes
+    routes: constantRoutes.concat(asyncRoutes)
   })
   router.matcher = newRouter.matcher // reset router
 }

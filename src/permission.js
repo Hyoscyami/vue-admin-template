@@ -23,7 +23,6 @@ router.beforeEach(async(to, from, next) => {
 
   if (hasToken) {
     if (errorList.indexOf(to.path) !== -1) {
-      console.log('跳转到错误页面:', to)
       next()
     } else if (to.path === '/login') {
       // if is logged in, redirect to the home page
@@ -37,8 +36,12 @@ router.beforeEach(async(to, from, next) => {
         await store.dispatch('permission/generateRoutes')
         // 没有权限
         if (!hasPermission(to.path)) {
-          console.log('to', to)
-          next({ path: '/401' })
+          // 标签页右击刷新
+          if (to.path.startsWith('/redirect')) {
+            next({path: '/' + to.params.path})
+          } else {
+            next({ path: '/401' })
+          }
         } else {
           next()
         }
