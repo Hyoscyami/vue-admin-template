@@ -5,7 +5,7 @@ import {listChildrenByCode} from '@/api/sys/dict'
 import {DictEnum} from '@/constants/dict'
 import {CommonEnum} from '@/constants/common'
 import {toRaw} from '@vue/reactivity'
-import {resetTreeQuery} from '@/composables/sys/dict'
+import {resetQuery} from '@/composables/sys/dict'
 // 树相关
 export const tree = reactive({
   // 搜索树的名称
@@ -110,7 +110,7 @@ export const formRef = ref(null)
 // 初始化树
 export function initTree() {
   // 重置树查询条件
-  resetTreeQuery(tree)
+  resetQuery(tree)
   tree.listQuery.minDistance = 0
   tree.listQuery.parentId = toRaw(tree).rootNode.id
   getTree(tree.listQuery).then(response => {

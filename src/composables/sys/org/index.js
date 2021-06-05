@@ -1,7 +1,7 @@
 import {nextTick, reactive, ref} from 'vue'
 import {dictConvert, isBlank, isNotEmptyCollection, successMsg, warningMsg} from '@/utils/common'
 import {DictEnum} from '@/constants/dict'
-import {add, del, getMaxSort, list, listChildrenByCode, update} from '@/api/sys/dict'
+import {add, del, getMaxSort, list, listChildrenByCode, update} from '@/api/sys/org'
 import {CommonEnum} from '@/constants/common'
 import {toRaw} from '@vue/reactivity'
 
@@ -17,7 +17,7 @@ export const tree = reactive({
   // 根节点
   rootNode: {
     id: 1,
-    name: '数据字典',
+    name: '总行',
     parentId: 0,
     isLeaf: false
   },
@@ -35,10 +35,10 @@ export const tree = reactive({
   listQuery: {
     page: 1,
     size: 100,
+    type: undefined,
     name: '',
     parentId: undefined,
-    code: '',
-    description: '',
+    orgNo: '',
     status: undefined,
     minDistance: undefined,
     maxDistance: undefined
@@ -46,7 +46,7 @@ export const tree = reactive({
   // 树查询结果返回节点的总数
   total: 0
 })
-// 父数据字典表格数据
+// 父机构表格数据
 export const table = reactive({
   tableData: [],
   total: 0,
@@ -54,27 +54,30 @@ export const table = reactive({
   listQuery: {
     page: 1,
     size: 20,
-    parentId: undefined,
+    type: undefined,
     name: '',
-    code: '',
-    description: '',
-    status: undefined
+    parentId: undefined,
+    orgNo: '',
+    status: undefined,
+    minDistance: undefined,
+    maxDistance: undefined
   },
   // 状态选择器
-  statusSelect: []
+  statusSelect: [],
+  // 类型选择器
+  typeSelect: []
 })
 // 对话框
 export const dialog = reactive({
-  // 新增数据字典弹框
+  // 新增机构弹框
   addDialogFormVisible: false,
   // 查看详情对话框
   viewDialogVisible: false,
   // 查看详情的数据
   viewDetailData: {
-    code: '',
+    orgNo: '',
     name: '',
-    value: '',
-    description: '',
+    type: undefined,
     status: undefined,
     sort: 1,
     createTime: '',
@@ -84,35 +87,31 @@ export const dialog = reactive({
   },
   // 新增或编辑数据字段对话框状态
   dialogStatus: '',
-  // 新增或编辑数据字典弹框
+  // 新增或编辑机构弹框
   textMap: {
     update: '编辑',
     create: '新增'
   },
   // 新增数据字段表单
   addForm: {
-    code: '',
+    orgNo: '',
     name: '',
-    value: '',
-    description: '',
+    type: undefined,
     status: 1,
     sort: 1,
     parentId: 0
   },
-  // 新增数据字典规则
+  // 新增机构规则
   addFormRules: {
-    code: [
-      {required: true, message: '请输入码值', trigger: 'blur'},
+    orgNo: [
+      {required: true, message: '请输入机构编号', trigger: 'blur'},
       {min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur'}
     ],
     name: [
-      {required: true, message: '请输入字典名称', trigger: 'change'}
+      {required: true, message: '请输入机构名称', trigger: 'change'}
     ],
-    value: [
-      {message: '请输入值', trigger: 'change'}
-    ],
-    description: [
-      {message: '请输入描述信息', trigger: 'change'}
+    type: [
+      {required: true, message: '请选择机构类型', trigger: 'change'}
     ],
     status: [
       {required: true, message: '请选择状态', trigger: 'change'}
@@ -124,14 +123,16 @@ export const dialog = reactive({
 })
 // 树ref
 export const treeRef = ref(null)
-// 对话框新增数据字典表单ref
+// 对话框新增机构表单ref
 export const addFormRef = ref(null)
 // 搜索表格的搜索表单
 export const searchFormRef = ref(null)
 // 初始化
 export function init() {
-// 初始化状态
+  // 初始化状态
   listStatus()
+  // 初始化类型
+  listTypes()
   // 初始化表格
   searchFormSubmit()
 }
@@ -148,7 +149,19 @@ export function listStatus() {
   })
 }
 
-// 搜索数据字典表单查询
+// 获取状态下拉框
+export function listTypes() {
+  listChildrenByCode(DictEnum.OrgTypes).then(response => {
+    response.data.forEach(item => {
+      const type = {
+        text: item.name,
+        value: item.value
+      }
+      table.typeSelect.push(type)
+    })
+  })
+}
+// 搜索机构表单查询
 export function searchFormSubmit() {
   table.listQuery.page = 1
   getList()
@@ -169,7 +182,7 @@ export function filterTree(searchText) {
   })
 }
 
-// 打开新增数据字典对话框
+// 打开新增机构对话框
 export function openAddDialog() {
   if (isBlank(tree.checkedNodeClick.id)) {
     warningMsg('请先在左侧选择节点')
@@ -178,8 +191,8 @@ export function openAddDialog() {
   dialog.addDialogFormVisible = true
   dialog.dialogStatus = CommonEnum.create
   getMaxSortValue(tree.checkedNodeClick.id)
-  dialog.addForm.parentId = toRaw(tree).checkedNodeClick.id
-  dialog.addForm.code = tree.checkedNodeClick.code
+  Object.assign(dialog.addForm.parentId, tree.checkedNodeClick.id)
+  Object.assign(dialog.addForm.code, tree.checkedNodeClick.code)
 }
 
 // 查看详情
@@ -194,7 +207,7 @@ export function getMaxSortValue(id) {
     dialog.addForm.sort = response.data + 1
   })
 }
-// 新增数据字典表单提交
+// 新增机构表单提交
 export function addFormSubmit() {
   addFormRef.value.validate((valid) => {
     if (valid) {
@@ -205,7 +218,6 @@ export function addFormSubmit() {
           // 刷新表格
           getList()
           // 刷新树
-          console.log('刷新树:', response.data, tree.checkedNodeClick)
           treeRef.value.append(response.data, tree.checkedNodeClick)
         })
       } else if (dialog.dialogStatus === CommonEnum.update) {
@@ -223,7 +235,7 @@ export function addFormSubmit() {
     }
   })
 }
-// 新增数据字典表单取消
+// 新增机构表单取消
 export function cancelAddForm() {
   dialog.addDialogFormVisible = false
   addFormRef.value.resetFields()
@@ -232,7 +244,7 @@ export function cancelAddForm() {
 export function cancelView() {
   dialog.viewDialogVisible = false
 }
-// 获取父数据字典列表数据
+// 获取父机构列表数据
 export function getList() {
   table.listLoading = true
   table.listQuery.parentId = toRaw(tree).checkedNodeClick.id
@@ -242,13 +254,13 @@ export function getList() {
     table.listLoading = false
   })
 }
-// 修改数据字典详情
+// 修改机构详情
 export function updateDetail(row) {
   dialog.dialogStatus = CommonEnum.update
   dialog.addDialogFormVisible = true
   Object.assign(dialog.addForm, row)
 }
-// 删除数据字典
+// 删除机构
 export function delRow(row) {
   del(row.id).then(response => {
     successMsg('操作成功')
@@ -335,7 +347,7 @@ export function setHasNext() {
 // 节点被点击
 export function handleNodeClick(data, node) {
   // 保存被选择节点
-  tree.checkedNodeClick = data
+  Object.assign(tree.checkedNodeClick, data)
   table.listQuery.parentId = data.id
   // 刷新表格
   getList()
@@ -375,26 +387,25 @@ export function viewNextPage(clickedNode) {
   clearHasNext(clickedNode)
 }
 // 重置树的搜索条件
-export function resetQuery(tree) {
-  tree.listQuery.page = 1
-  tree.listQuery.parentId = undefined
-  tree.listQuery.code = ''
-  tree.listQuery.description = ''
-  tree.listQuery.status = undefined
-  tree.listQuery.name = ''
-  tree.total = 0
-  tree.listQuery.minDistance = 1
-  tree.listQuery.maxDistance = undefined
+export function resetQuery(data) {
+  data.listQuery.page = 1
+  data.listQuery.parentId = undefined
+  data.listQuery.status = undefined
+  data.listQuery.name = ''
+  data.listQuery.orgNo = ''
+  data.total = 0
+  data.listQuery.minDistance = 1
+  data.listQuery.maxDistance = undefined
 }
 // 表格的搜索表单重置
 export function resetSearchForm() {
   searchFormRef.value.resetFields()
 }
-// 单元格样式
-export function cellClass() {
-  return {borderColor: '#0e2231'}
-}
-// 表头样式
-export function headerClass() {
-  return {borderColor: '#0e2231', background: '#b1b3b8', color: '#151617'}
+// 根据类型刷新表格
+export function filterTableType(value, row, column) {
+  // 重置查询条件
+  resetQuery(table)
+  table.listQuery.type = value
+  // 刷新表格数据
+  getList()
 }

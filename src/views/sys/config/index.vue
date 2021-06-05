@@ -348,7 +348,6 @@ export default {
     getList() {
       this.table.listLoading = true
       list(this.table.listQuery).then(response => {
-        console.log('getList:response,', response)
         this.table.tableData = response.data.records
         this.table.total = response.data.total
         this.table.listLoading = false

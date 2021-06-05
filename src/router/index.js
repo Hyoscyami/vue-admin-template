@@ -65,6 +65,18 @@ export const constantRoutes = [
         meta: {title: '组织管理', icon: 'table'}
       },
       {
+        path: 'role',
+        name: 'Role',
+        component: () => import('@/views/sys/role'),
+        meta: {title: '角色管理', icon: 'table'}
+      },
+      {
+        path: 'operator',
+        name: 'Operator',
+        component: () => import('@/views/sys/operator'),
+        meta: {title: '员工管理', icon: 'table'}
+      },
+      {
         path: 'permission',
         name: 'Permission',
         component: () => import('@/views/sys/permission'),

@@ -39,13 +39,8 @@
             <el-form-item label="名称" prop="description">
               <el-input v-model="table.listQuery.name" placeholder="模糊查询名称" />
             </el-form-item>
-            <el-form-item label="机构编号" prop="orgNo">
-              <el-input v-model="table.listQuery.orgNo" placeholder="精确查询机构编号" />
-            </el-form-item>
-            <el-form-item label="机构类型" prop="status">
-              <el-select v-model="table.listQuery.type" placeholder="类型" clearable>
-                <el-option v-for="item in table.statusSelect" :key="item.id" :label="item.name" :value="item.value" />
-              </el-select>
+            <el-form-item label="码值" prop="code">
+              <el-input v-model="table.listQuery.code" placeholder="精确查询码值" />
             </el-form-item>
             <el-form-item label="状态" prop="status">
               <el-select v-model="table.listQuery.status" placeholder="状态" clearable>
@@ -63,16 +58,20 @@
         </div>
         <el-table
           v-loading="table.listLoading"
+          class="el-table"
+          :cell-style="cellClass"
+          :header-cell-style="headerClass"
           :data="table.tableData"
           style="width: 100%"
+          border
         >
           <el-table-column
             type="selection"
             width="55"
           />
           <el-table-column
-            prop="orgNo"
-            label="机构编号"
+            prop="code"
+            label="码值"
           />
           <el-table-column
             prop="name"
@@ -83,14 +82,8 @@
             label="值"
           />
           <el-table-column
-            prop="orgPath"
-            label="所属组织"
-          />
-          <el-table-column
-            prop="type"
-            label="类型"
-            :filters="table.typeSelect"
-            :filter-method="filterTableType"
+            prop="description"
+            label="描述"
           />
           <el-table-column
             prop="status"
@@ -139,22 +132,22 @@
           :before-close="cancelAddForm"
         >
           <el-form ref="addFormRef" :model="dialog.addForm" :rules="dialog.addFormRules" label-width="80px">
-            <el-form-item label="组织名称" prop="name">
+            <el-form-item label="字典名称" prop="name">
               <el-input v-model="dialog.addForm.name" autocomplete="off" tabindex="1" />
             </el-form-item>
-            <el-form-item label="机构编号" prop="orgNo">
-              <el-input v-model="dialog.addForm.orgNo" autocomplete="off" tabindex="2" />
+            <el-form-item label="码值" prop="code">
+              <el-input v-model="dialog.addForm.code" autocomplete="off" tabindex="2" />
             </el-form-item>
-            <el-form-item label="机构类型" prop="type" tabindex="3">
-              <el-radio-group v-model="dialog.addForm.type">
-                <el-radio v-model="dialog.addForm.type" :label="1">启用</el-radio>
-                <el-radio v-model="dialog.addForm.type" :label="0">禁用</el-radio>
-              </el-radio-group>
+            <el-form-item label="值" prop="value">
+              <el-input v-model="dialog.addForm.value" autocomplete="off" tabindex="3" />
             </el-form-item>
-            <el-form-item label="排序值" prop="sort" tabindex="4">
+            <el-form-item label="描述" prop="description">
+              <el-input v-model="dialog.addForm.description" autocomplete="off" tabindex="4" />
+            </el-form-item>
+            <el-form-item label="排序值" prop="sort">
               <el-input v-model="dialog.addForm.sort" autocomplete="off" tabindex="5" />
             </el-form-item>
-            <el-form-item label="状态" prop="status" tabindex="5">
+            <el-form-item label="状态" prop="status" tabindex="6">
               <el-radio-group v-model="dialog.addForm.status">
                 <el-radio v-model="dialog.addForm.status" :label="1">启用</el-radio>
                 <el-radio v-model="dialog.addForm.status" :label="0">禁用</el-radio>
@@ -228,13 +221,15 @@ import {
   addFormSubmit,
   cancelAddForm,
   cancelView,
+  cellClass,
   delRow,
-  dialog, filterTableType,
+  dialog,
   filterTree,
   getList,
   handleNodeClick,
   handleNodeCollapse,
   handleNodeExpand,
+  headerClass,
   init,
   loadNode,
   openAddDialog,
@@ -246,12 +241,11 @@ import {
   updateStatus,
   viewDetail,
   viewNextPage
-} from '@/composables/sys/org'
-import {cellClass, headerClass} from '@/composables/sys/dict'
+} from '@/composables/sys/dict'
 import {computed, watch} from 'vue'
 
 export default {
-  name: 'Org',
+  name: 'Operator',
   components: {Pagination},
   setup() {
     // 初始化
@@ -292,14 +286,13 @@ export default {
       getList,
       cancelAddForm,
       addFormSubmit,
-      cancelView,
-      filterTableType
+      cancelView
     }
   }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 $bg: #283443;
 .tree-box {
   height: 1300px;
@@ -315,4 +308,7 @@ $bg: #283443;
   padding-right: 8px;
 }
 
+.el-table {
+  border: #0e2231 solid 1px;
+}
 </style>
