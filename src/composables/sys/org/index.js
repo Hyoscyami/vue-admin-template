@@ -103,10 +103,10 @@ export const dialog = reactive({
   },
   // 新增机构规则
   addFormRules: {
-    orgNo: [
-      {required: true, message: '请输入机构编号', trigger: 'blur'},
-      {min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur'}
-    ],
+    // orgNo: [
+    //   {required: true, message: '请输入机构编号', trigger: 'blur'},
+    //   {min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur'}
+    // ],
     name: [
       {required: true, message: '请输入机构名称', trigger: 'change'}
     ],
@@ -197,8 +197,8 @@ export function openAddDialog() {
   dialog.addDialogFormVisible = true
   dialog.dialogStatus = CommonEnum.create
   getMaxSortValue(tree.checkedNodeClick.id)
-  Object.assign(dialog.addForm.parentId, tree.checkedNodeClick.id)
-  Object.assign(dialog.addForm.code, tree.checkedNodeClick.code)
+  dialog.addForm.parentId = toRaw(tree).checkedNodeClick.id
+  dialog.addForm.code = toRaw(tree).checkedNodeClick.code
 }
 
 // 查看详情

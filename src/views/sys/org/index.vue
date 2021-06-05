@@ -134,14 +134,13 @@
             <el-form-item label="组织名称" prop="name">
               <el-input v-model="dialog.addForm.name" autocomplete="off" tabindex="1" />
             </el-form-item>
-            <el-form-item label="机构编号" prop="orgNo">
-              <el-input v-model="dialog.addForm.orgNo" autocomplete="off" tabindex="2" />
-            </el-form-item>
+            <!--            <el-form-item label="机构编号" prop="orgNo">-->
+            <!--              <el-input v-model="dialog.addForm.orgNo" autocomplete="off" tabindex="2" />-->
+            <!--            </el-form-item>-->
             <el-form-item label="机构类型" prop="type" tabindex="3">
-              <el-radio-group v-model="dialog.addForm.type">
-                <el-radio v-model="dialog.addForm.type" :label="1">启用</el-radio>
-                <el-radio v-model="dialog.addForm.type" :label="0">禁用</el-radio>
-              </el-radio-group>
+              <el-select v-model="dialog.addForm.type" placeholder="请选择机构类型" clearable>
+                <el-option v-for="item in table.typeSelect" :key="item.id" :label="item.text" :value="item.value" />
+              </el-select>
             </el-form-item>
             <el-form-item label="排序值" prop="sort" tabindex="4">
               <el-input v-model="dialog.addForm.sort" autocomplete="off" tabindex="5" />
@@ -221,7 +220,7 @@ import {
   cancelAddForm,
   cancelView,
   delRow,
-  dialog, filterTableType,
+  dialog, filterTableStatus, filterTableType,
   filterTree,
   getList,
   handleNodeClick,
@@ -285,7 +284,8 @@ export default {
       cancelAddForm,
       addFormSubmit,
       cancelView,
-      filterTableType
+      filterTableType,
+      filterTableStatus
     }
   }
 }
