@@ -145,7 +145,13 @@ export function viewDetailDataStatus() {
 // 获取状态下拉框
 export function listStatus() {
   listChildrenByCode(DictEnum.DictStatus).then(response => {
-    table.statusSelect = response.data
+    response.data.forEach(item => {
+      const status = {
+        text: item.name,
+        value: item.value
+      }
+      table.statusSelect.push(status)
+    })
   })
 }
 
@@ -409,3 +415,12 @@ export function filterTableType(value, row, column) {
   // 刷新表格数据
   getList()
 }
+// 根据状态刷新表格
+export function filterTableStatus(value, row, column) {
+  // 重置查询条件
+  resetQuery(table)
+  table.listQuery.status = value
+  // 刷新表格数据
+  getList()
+}
+

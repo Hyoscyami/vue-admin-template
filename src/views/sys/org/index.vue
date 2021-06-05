@@ -42,16 +42,6 @@
             <el-form-item label="机构编号" prop="orgNo">
               <el-input v-model="table.listQuery.orgNo" placeholder="精确查询机构编号" />
             </el-form-item>
-            <el-form-item label="机构类型" prop="status">
-              <el-select v-model="table.listQuery.type" placeholder="类型" clearable>
-                <el-option v-for="item in table.statusSelect" :key="item.id" :label="item.name" :value="item.value" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="状态" prop="status">
-              <el-select v-model="table.listQuery.status" placeholder="状态" clearable>
-                <el-option v-for="item in table.statusSelect" :key="item.id" :label="item.name" :value="item.value" />
-              </el-select>
-            </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="searchFormSubmit">查询</el-button>
               <el-button @click="resetSearchForm">重置</el-button>
@@ -95,6 +85,8 @@
           <el-table-column
             prop="status"
             label="状态"
+            :filters="table.statusSelect"
+            :filter-method="filterTableStatus"
           >
             <template #default="scope">
               <el-switch
