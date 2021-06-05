@@ -156,11 +156,11 @@ export function searchFormSubmit() {
 
 // 搜索tree
 export function filterTree(searchText) {
-  if (isBlank(searchText)) {
-    return
-  }
   // 重置树的搜索条件
-  resetTreeQuery()
+  resetTreeQuery(tree)
+  if (isBlank(searchText)) {
+    tree.listQuery.maxDistance = 1
+  }
   tree.listQuery.parentId = toRaw(tree).rootNode.id
   tree.listQuery.name = searchText
   list(tree.listQuery).then(response => {
@@ -313,7 +313,7 @@ export function loadNextPageData() {
  */
 export async function getChildrenNode(id) {
   // 重置查询条件
-  resetTreeQuery()
+  resetTreeQuery(tree)
   tree.listQuery.parentId = id
   tree.listQuery.minDistance = 1
   tree.listQuery.maxDistance = 1
@@ -374,7 +374,7 @@ export function viewNextPage(clickedNode) {
   clearHasNext(clickedNode)
 }
 // 重置树的搜索条件
-export function resetTreeQuery() {
+export function resetTreeQuery(tree) {
   tree.listQuery.page = 1
   tree.listQuery.parentId = undefined
   tree.listQuery.code = ''

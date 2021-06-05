@@ -12,9 +12,10 @@
           :props="tree.props"
           :default-expanded-keys="tree.defaultExpandedKeys"
           node-key="id"
+          :filter-node-method="filterNode"
           :expand-on-click-node="false"
           :highlight-current="true"
-          empty-text="数据加载中"
+          empty-text="暂无数据"
           @node-click="handleNodeClick"
         />
       </el-col>
@@ -81,15 +82,18 @@ import {
   treeRef,
   rules,
   handleAddClick,
-  formRef
+  formRef, filterTree, filterNode
 } from '@/composables/sys/permission'
 import hasPermission from '@/utils/permission'
+import {watch} from 'vue'
 
 export default {
   name: 'Permission',
   setup() {
     // 初始化
     init()
+    // 搜索树
+    watch(() => tree.filterTreeText, (searchText) => filterTree(searchText))
     return {
       tree,
       rules,
@@ -99,7 +103,8 @@ export default {
       save,
       handleAddClick,
       formRef,
-      hasPermission
+      hasPermission,
+      filterNode
     }
   }
 }

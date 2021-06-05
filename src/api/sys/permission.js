@@ -27,10 +27,14 @@ export function getMaxSort(id) {
   })
 }
 
-export function getTree() {
+export function getTree(data) {
   return request({
     url: '/permission/tree',
-    method: 'get'
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    },
+    data
   })
 }
 export function update(data) {

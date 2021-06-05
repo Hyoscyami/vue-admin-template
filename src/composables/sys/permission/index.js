@@ -1,9 +1,11 @@
 import {reactive, ref} from 'vue'
 import {add, getMaxSort, getTree, update} from '@/api/sys/permission'
-import {successMsg, warningMsg} from '@/utils/common'
+import {isNotEmptyCollection, successMsg, warningMsg} from '@/utils/common'
 import {listChildrenByCode} from '@/api/sys/dict'
 import {DictEnum} from '@/constants/dict'
 import {CommonEnum} from '@/constants/common'
+import {toRaw} from '@vue/reactivity'
+import {resetTreeQuery} from '@/composables/sys/dict'
 // 树相关
 export const tree = reactive({
   // 搜索树的名称
@@ -25,7 +27,26 @@ export const tree = reactive({
   // 状态可选。下拉框使用
   statusSelect: [],
   // 表单状态
-  formStatus: ''
+  formStatus: '',
+  // tree分页查询对象
+  listQuery: {
+    page: 1,
+    size: 100,
+    name: '',
+    parentId: undefined,
+    code: '',
+    description: '',
+    status: undefined,
+    minDistance: 1,
+    maxDistance: undefined
+  },
+  // 根节点
+  rootNode: {
+    id: 1,
+    name: '菜单',
+    parentId: 0,
+    isLeaf: false
+  }
 })
 
 // 被单击选择的节点
@@ -88,9 +109,15 @@ export const treeRef = ref(null)
 export const formRef = ref(null)
 // 初始化树
 export function initTree() {
-  getTree().then(response => {
+  // 重置树查询条件
+  resetTreeQuery(tree)
+  tree.listQuery.minDistance = 0
+  tree.listQuery.parentId = toRaw(tree).rootNode.id
+  getTree(tree.listQuery).then(response => {
     tree.data = response.data
-    tree.defaultExpandedKeys.push(tree.data[0].id)
+    if (isNotEmptyCollection(tree.data)) {
+      tree.defaultExpandedKeys.push(tree.data[0].id)
+    }
   })
 }
 
@@ -190,4 +217,30 @@ export function handleEditClick() {
     return
   }
   Object.assign(form, checkedNode)
+}
+// 搜索tree
+export function filterTree(searchText) {
+  console.log('搜索:', searchText)
+  treeRef.value.filter(searchText)
+  // // 重置树的搜索条件
+  // resetTreeQuery(tree)
+  // tree.listQuery.minDistance = 0
+  // if (searchText) {
+  //   tree.listQuery.maxDistance = 1
+  // }
+  // tree.listQuery.parentId = toRaw(tree).rootNode.id
+  // tree.listQuery.name = searchText
+  // getTree(tree.listQuery).then(response => {
+  //   if (response.data) {
+  //     // 有数据返回，更新到根节点下，并去除返回的根节点
+  //     treeRef.value.updateKeyChildren(toRaw(tree).rootNode.id, response.data[0].children || [])
+  //   } else {
+  //     treeRef.value.updateKeyChildren(toRaw(tree).rootNode.id, [])
+  //   }
+  // })
+}
+// 过滤节点，全量加载树的时候用
+export function filterNode(value, data) {
+  if (!value) return true
+  return data.name.indexOf(value) !== -1
 }
