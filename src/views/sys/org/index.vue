@@ -69,10 +69,6 @@
             label="名称"
           />
           <el-table-column
-            prop="value"
-            label="值"
-          />
-          <el-table-column
             prop="orgPath"
             label="所属组织"
           />
@@ -145,7 +141,7 @@
             <el-form-item label="排序值" prop="sort" tabindex="4">
               <el-input v-model="dialog.addForm.sort" autocomplete="off" tabindex="5" />
             </el-form-item>
-            <el-form-item label="状态" prop="status" tabindex="5">
+            <el-form-item label="状态" prop="status" tabindex="6">
               <el-radio-group v-model="dialog.addForm.status">
                 <el-radio v-model="dialog.addForm.status" :label="1">启用</el-radio>
                 <el-radio v-model="dialog.addForm.status" :label="0">禁用</el-radio>

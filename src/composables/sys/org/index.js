@@ -161,7 +161,7 @@ export function listTypes() {
     response.data.forEach(item => {
       const type = {
         text: item.name,
-        value: item.value
+        value: Number(item.value)
       }
       table.typeSelect.push(type)
     })
@@ -197,8 +197,7 @@ export function openAddDialog() {
   dialog.addDialogFormVisible = true
   dialog.dialogStatus = CommonEnum.create
   getMaxSortValue(tree.checkedNodeClick.id)
-  dialog.addForm.parentId = toRaw(tree).checkedNodeClick.id
-  dialog.addForm.code = toRaw(tree).checkedNodeClick.code
+  Object.assign(dialog.addForm, tree.checkedNodeClick)
 }
 
 // 查看详情
@@ -265,6 +264,7 @@ export function updateDetail(row) {
   dialog.dialogStatus = CommonEnum.update
   dialog.addDialogFormVisible = true
   Object.assign(dialog.addForm, row)
+  console.log('编辑:', dialog.addForm, row)
 }
 // 删除机构
 export function delRow(row) {
@@ -353,7 +353,7 @@ export function setHasNext() {
 // 节点被点击
 export function handleNodeClick(data, node) {
   // 保存被选择节点
-  Object.assign(tree.checkedNodeClick, data)
+  tree.checkedNodeClick = data
   table.listQuery.parentId = data.id
   // 刷新表格
   getList()
