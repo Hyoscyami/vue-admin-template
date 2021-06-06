@@ -145,6 +145,7 @@ export function viewDetailDataStatus() {
 // 获取状态下拉框
 export function listStatus() {
   listChildrenByCode(DictEnum.DictStatus).then(response => {
+    table.statusSelect.length = 0
     response.data.forEach(item => {
       const status = {
         text: item.name,
@@ -158,6 +159,7 @@ export function listStatus() {
 // 获取状态下拉框
 export function listTypes() {
   listChildrenByCode(DictEnum.OrgTypes).then(response => {
+    table.typeSelect.length = 0
     response.data.forEach(item => {
       const type = {
         text: item.name,
@@ -264,7 +266,6 @@ export function updateDetail(row) {
   dialog.dialogStatus = CommonEnum.update
   dialog.addDialogFormVisible = true
   Object.assign(dialog.addForm, row)
-  console.log('编辑:', dialog.addForm, row)
 }
 // 删除机构
 export function delRow(row) {
@@ -283,6 +284,7 @@ export function delRow(row) {
 export async function loadNode(node, resolve) {
   tree.checkedNodeDropdown = node
   if (node.level === 0) {
+    console.log('初始化树', node)
     // 最开始的时候，默认根节点被选中
     // 默认展开第二级
     nextTick(() => {
@@ -290,7 +292,7 @@ export async function loadNode(node, resolve) {
       rootNode.expanded = true
       // 默认选中根节点
       treeRef.value.setCurrentKey(rootNode.id, true)
-      Object.assign(tree.checkedNodeClick, rootNode)
+      tree.checkedNodeClick.id = rootNode.data.id
     }).then(r => node.childNodes[0].loadData())
     return resolve([tree.rootNode])
   }
@@ -409,6 +411,7 @@ export function resetSearchForm() {
 }
 // 根据类型刷新表格
 export function filterTableType(value, row, column) {
+  console.log('filterType:', value)
   // 重置查询条件
   resetQuery(table)
   table.listQuery.type = value
@@ -417,10 +420,18 @@ export function filterTableType(value, row, column) {
 }
 // 根据状态刷新表格
 export function filterTableStatus(value, row, column) {
+  console.log('筛选表格:', value)
   // 重置查询条件
   resetQuery(table)
   table.listQuery.status = value
   // 刷新表格数据
   getList()
 }
-
+// 组织类型转换
+export function convertTypeToChinese(row) {
+  if (row.type === 1) {
+    return '实体组织'
+  } else if (row.type === 2) {
+    return '部门'
+  }
+}

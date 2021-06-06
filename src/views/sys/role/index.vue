@@ -58,9 +58,6 @@
         </div>
         <el-table
           v-loading="table.listLoading"
-          class="el-table"
-          :cell-style="cellClass"
-          :header-cell-style="headerClass"
           :data="table.tableData"
           style="width: 100%"
           border
@@ -221,7 +218,6 @@ import {
   addFormSubmit,
   cancelAddForm,
   cancelView,
-  cellClass,
   delRow,
   dialog,
   filterTree,
@@ -229,7 +225,6 @@ import {
   handleNodeClick,
   handleNodeCollapse,
   handleNodeExpand,
-  headerClass,
   init,
   loadNode,
   openAddDialog,
@@ -280,8 +275,6 @@ export default {
       viewNextPage,
       searchFormSubmit,
       resetSearchForm,
-      cellClass,
-      headerClass,
       updateStatus,
       getList,
       cancelAddForm,

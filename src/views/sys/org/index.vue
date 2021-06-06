@@ -77,6 +77,7 @@
             label="类型"
             :filters="table.typeSelect"
             :filter-method="filterTableType"
+            :formatter="convertTypeToChinese"
           />
           <el-table-column
             prop="status"
@@ -214,7 +215,7 @@ import {
   addFormRef,
   addFormSubmit,
   cancelAddForm,
-  cancelView,
+  cancelView, convertTypeToChinese,
   delRow,
   dialog, filterTableStatus, filterTableType,
   filterTree,
@@ -281,7 +282,8 @@ export default {
       addFormSubmit,
       cancelView,
       filterTableType,
-      filterTableStatus
+      filterTableStatus,
+      convertTypeToChinese
     }
   }
 }
