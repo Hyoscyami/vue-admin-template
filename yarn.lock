@@ -1252,6 +1252,11 @@
   "resolved" "https://registry.npm.taobao.org/@types/normalize-package-data/download/@types/normalize-package-data-2.4.0.tgz?cache=0&sync_timestamp=1613379350842&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fnormalize-package-data%2Fdownload%2F%40types%2Fnormalize-package-data-2.4.0.tgz"
   "version" "2.4.0"
 
+"@types/nprogress@^0.2.0":
+  "integrity" "sha1-hsWTaC1BmSEqBQnMPE1WK7vW5F8="
+  "resolved" "https://registry.nlark.com/@types/nprogress/download/@types/nprogress-0.2.0.tgz?cache=0&sync_timestamp=1621242037799&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40types%2Fnprogress%2Fdownload%2F%40types%2Fnprogress-0.2.0.tgz"
+  "version" "0.2.0"
+
 "@types/parse-json@^4.0.0":
   "integrity" "sha1-L4u0QUNNFjs1+4/9zNcTiSf/uMA="
   "resolved" "https://registry.npm.taobao.org/@types/parse-json/download/@types/parse-json-4.0.0.tgz?cache=0&sync_timestamp=1613380133657&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fparse-json%2Fdownload%2F%40types%2Fparse-json-4.0.0.tgz"
@@ -8223,7 +8228,7 @@
     "gauge" "~2.7.3"
     "set-blocking" "~2.0.0"
 
-"nprogress@0.2.0":
+"nprogress@^0.2.0":
   "integrity" "sha1-y480xTIT2JVyP8urkH6UIq28r7E="
   "resolved" "https://registry.npm.taobao.org/nprogress/download/nprogress-0.2.0.tgz"
   "version" "0.2.0"

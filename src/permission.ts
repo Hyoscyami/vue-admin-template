@@ -11,10 +11,9 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 const whiteList = ['/login'] // no redirect whitelist
 const errorList = ['/401'] // 错误页面
 
-router.beforeEach(async(to, from, next) => {
+router.beforeEach(async(to, _from, next) => {
   // start progress bar
   NProgress.start()
-
   // set page title
   document.title = getPageTitle(to.meta.title)
 

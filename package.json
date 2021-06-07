@@ -20,7 +20,7 @@
     "element-plus": "^1.0.2-beta.36",
     "js-cookie": "2.2.0",
     "normalize.css": "7.0.0",
-    "nprogress": "0.2.0",
+    "nprogress": "^0.2.0",
     "path-to-regexp": "2.4.0",
     "vue": "^3.0.9",
     "vue-loader": "^16.2.0",
@@ -28,6 +28,7 @@
     "vuex": "^4.0.0"
   },
   "devDependencies": {
+    "@types/nprogress": "^0.2.0",
     "@vue/cli-plugin-babel": "4.4.4",
     "@vue/cli-plugin-eslint": "4.4.4",
     "@vue/cli-plugin-unit-jest": "4.4.4",

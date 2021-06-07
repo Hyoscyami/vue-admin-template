@@ -1,5 +1,5 @@
 declare module '*.vue' {
-  import type { defineComponent } from 'vue';
+  import type {defineComponent} from 'vue';
   const Component: ReturnType<typeof defineComponent>;
   export default Component;
 }
@@ -11,3 +11,4 @@ declare module 'element-plus/lib/locale/lang/*' {
 declare module '*.gif' {
   export const gif: any
 }
+declare module 'nprogress';
