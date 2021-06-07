@@ -82,8 +82,8 @@
             label="值"
           />
           <el-table-column
-            prop="description"
-            label="描述"
+            prop="completePath"
+            label="完整路径"
           />
           <el-table-column
             prop="status"
