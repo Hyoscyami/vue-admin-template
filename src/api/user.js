@@ -10,7 +10,7 @@ export function login(data) {
 
 export function getInfo(token) {
   return request({
-    url: '/vue-admin-template/user/info',
+    url: '/operator/getUserInfo',
     method: 'get',
     params: { token }
   })
@@ -18,7 +18,12 @@ export function getInfo(token) {
 
 export function logout() {
   return request({
-    url: '/vue-admin-template/user/logout',
+    url: '/operator/logout',
     method: 'post'
   })
 }
+
+export function getCaptcha() {
+  return request({url: '/getCaptcha', method: 'get'})
+}
+

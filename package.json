@@ -2,7 +2,7 @@
   "name": "vue-admin-template",
   "version": "4.4.0",
   "description": "A vue admin template with Element UI & axios & iconfont & permission control & lint",
-  "author": "Pan <panfree23@gmail.com>",
+  "author": "xushifei",
   "scripts": {
     "dev": "vue-cli-service serve",
     "build:prod": "vue-cli-service build",
@@ -16,6 +16,7 @@
   "dependencies": {
     "axios": "0.18.1",
     "core-js": "3.6.5",
+    "dayjs": "^1.10.4",
     "element-plus": "^1.0.2-beta.36",
     "js-cookie": "2.2.0",
     "normalize.css": "7.0.0",

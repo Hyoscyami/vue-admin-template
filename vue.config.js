@@ -37,6 +37,10 @@ module.exports = {
       errors: true
     },
     proxy: {
+      '/api/mock': {
+        target: `http://localhost:${port}/mock`,
+        changeOrigin: true
+      },
       '/api': {
         target: 'http://localhost:8080', // 代理地址，这里设置的地址会代替axios中设置的baseURL
         changeOrigin: true, // 如果接口跨域，需要进行这个参数配置

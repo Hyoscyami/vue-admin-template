@@ -1,7 +1,7 @@
 <template>
   <el-container class="login-container">
     <el-form
-      ref="loginForm"
+      ref="loginFormRef"
       :model="loginForm"
       :rules="loginRules"
       class="login-form"
@@ -33,14 +33,13 @@
         </span>
         <el-input
           :key="passwordType"
-          ref="password"
+          ref="passwordRef"
           v-model="loginForm.password"
           :type="passwordType"
           placeholder="Password"
           name="password"
           tabindex="2"
           auto-complete="on"
-          @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
@@ -55,17 +54,22 @@
               type="text"
               name="verifyCode"
               tabindex="3"
+              maxlength="5"
+              @keyup.enter.native="handleLogin"
             />
           </el-form-item>
         </el-col>
         <el-col :span="6" :offset="3">
           <img
             style="width: 150px; height: 50px"
-            :src="url"
+            :src="verifyCodeUrl"
             alt="验证码加载失败"
             @click="changeVerifyCode"
           >
         </el-col>
+      </el-row>
+      <el-row>
+        <el-checkbox v-model="loginForm.rememberMe" true-label="yes" false-label="no">记住我</el-checkbox>
       </el-row>
       <el-button
         :loading="loading"
@@ -81,95 +85,85 @@
 </template>
 
 <script>
-import {validUsername} from '@/utils/validate'
-import request from '@/utils/request'
+import {onMounted, reactive, ref, watch} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {useStore} from 'vuex'
+import {
+  useChangeVerifyCode,
+  useShowPwd,
+  validatePassword,
+  validateUsername,
+  validateVerifyCode
+} from '@/composables/login/login'
 
 export default {
   name: 'Login',
-  data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('请输入账号'))
-      } else {
-        callback()
-      }
+  setup() {
+    const router = useRouter()
+    const route = useRoute()
+    const store = useStore()
+
+    // 登录表单，定义对象一般用reactive
+    const loginForm = reactive({
+      username: '',
+      password: '',
+      verifyCode: '',
+      verifyCodeId: '',
+      rememberMe: 'yes'
+    })
+    // ref表单，this.refs.loginFormRef.XXX等于vue3里的loginFormRef.XXX
+    const loginFormRef = ref(null)
+    // ref密码input框
+    const passwordRef = ref(null)
+    // 登录规则
+    const loginRules = {
+      username: [{required: true, trigger: 'blur', validator: validateUsername}],
+      password: [{required: true, trigger: 'blur', validator: validatePassword}],
+      verifyCode: [{required: true, trigger: 'blur', validator: validateVerifyCode}]
     }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('请输入密码'))
-      } else {
-        callback()
-      }
-    }
-    const validateVerifyCode = (rule, value, callback) => {
-      if (value.length < 4) {
-        callback(new Error('请输入验证码'))
-      } else {
-        callback()
-      }
-    }
-    return {
-      loginForm: {
-        username: '',
-        password: '',
-        verifyCode: ''
-      },
-      loginRules: {
-        username: [{required: true, trigger: 'blur', validator: validateUsername}],
-        password: [{required: true, trigger: 'blur', validator: validatePassword}],
-        verifyCode: [{required: true, trigger: 'blur', validator: validateVerifyCode}]
-      },
-      loading: false,
-      passwordType: 'password',
-      redirect: undefined,
-      fits: ['fill', 'contain', 'cover', 'none', 'scale-down'],
-      url: ''
-    }
-  },
-  watch: {
-    $route: {
-      handler: function(route) {
-        this.redirect = route.query && route.query.redirect
-      },
+    // 登录loading
+    const loading = ref(false)
+    const passwordType = ref('password')
+    // 登录后重定向跳转，如果链接附带了重定向地址，则跳转
+    const redirect = ref(undefined)
+    // 验证码地址
+    const verifyCodeUrl = ref('')
+
+    watch(() => route, (route) => {
+      redirect.value = route.query && route.query.redirect
+    }, {
       immediate: true
-    }
-  },
-  mounted() {
-    // 验证码初始化
-    this.changeVerifyCode()
-  },
-  methods: {
-    showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
-    },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+    })
+    const {changeVerifyCode} = useChangeVerifyCode(verifyCodeUrl, loginForm)
+    onMounted(changeVerifyCode)
+
+    const {showPwd} = useShowPwd(passwordType, passwordRef)
+    const handleLogin = () => {
+      loginFormRef.value.validate(valid => {
         if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({path: this.redirect || '/'})
-            this.loading = false
+          loading.value = true
+          store.dispatch('user/login', loginForm).then(() => {
+            router.push({path: redirect.value || '/'})
+            loading.value = false
           }).catch(() => {
-            this.loading = false
+            loading.value = false
           })
         } else {
-          console.log('error submit!!')
           return false
         }
       })
-    },
-    changeVerifyCode() {
-      request({url: '/getCaptcha', method: 'get'}).then(response => {
-        console.log(response)
-        this.url = response.data.verifyCodeStr
-      })
+    }
+    return {
+      loginForm,
+      loginRules,
+      loading,
+      passwordType,
+      verifyCodeUrl,
+      loginFormRef,
+      passwordRef,
+      showPwd,
+      handleLogin,
+      changeVerifyCode
     }
   }
 }
