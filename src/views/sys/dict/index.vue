@@ -42,11 +42,6 @@
             <el-form-item label="码值" prop="code">
               <el-input v-model="table.listQuery.code" placeholder="精确查询码值" />
             </el-form-item>
-            <el-form-item label="状态" prop="status">
-              <el-select v-model="table.listQuery.status" placeholder="状态" clearable>
-                <el-option v-for="item in table.statusSelect" :key="item.id" :label="item.name" :value="item.value" />
-              </el-select>
-            </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="searchFormSubmit">查询</el-button>
               <el-button @click="resetSearchForm">重置</el-button>

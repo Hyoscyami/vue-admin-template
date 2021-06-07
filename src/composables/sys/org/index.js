@@ -199,7 +199,7 @@ export function openAddDialog() {
   dialog.addDialogFormVisible = true
   dialog.dialogStatus = CommonEnum.create
   getMaxSortValue(tree.checkedNodeClick.id)
-  Object.assign(dialog.addForm, tree.checkedNodeClick)
+  dialog.addForm.parentId = toRaw(tree).checkedNodeClick.id
 }
 
 // 查看详情

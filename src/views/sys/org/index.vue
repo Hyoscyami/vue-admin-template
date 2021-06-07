@@ -69,7 +69,7 @@
             label="名称"
           />
           <el-table-column
-            prop="orgPath"
+            prop="completePath"
             label="所属组织"
           />
           <el-table-column

@@ -4,65 +4,20 @@ import {DictEnum} from '@/constants/dict'
 import {add, del, getMaxSort, list, listChildrenByCode, update} from '@/api/sys/dict'
 import {CommonEnum} from '@/constants/common'
 import {toRaw} from '@vue/reactivity'
+import {Tree} from '@/class/Tree'
+import {Table} from '@/class/Table'
+
+// 初始化树的对象
+const initTree = new Tree()
+initTree.rootNode.name = '数据字典'
+// 初始化表格的对象
+const initTable = new Table()
 
 // 树相关
-export const tree = reactive({
-  // 过滤树的字段
-  filterTreeText: '',
-  // 树的属性重命名
-  treeProps: {
-    label: 'name',
-    isLeaf: 'isLeaf'
-  },
-  // 根节点
-  rootNode: {
-    id: 1,
-    name: '数据字典',
-    parentId: 0,
-    isLeaf: false
-  },
-  // 单击被选中节点，给右侧表格列表查询使用，默认是根节点，因为mounted里会初始化表格，而tree初始化这个字段在初始化表格之后
-  checkedNodeClick: {
-    id: 1
-  },
-  // 点击下拉图标选中的节点，给树滚动加载使用
-  checkedNodeDropdown: {},
-  // 当前被点击节点懒加载子树的数据
-  loadChildrenTreeData: [],
-  // 最开始默认展开的node对应的keys
-  defaultExpandedKeys: [],
-  // tree分页查询对象
-  listQuery: {
-    page: 1,
-    size: 100,
-    name: '',
-    parentId: undefined,
-    code: '',
-    description: '',
-    status: undefined,
-    minDistance: undefined,
-    maxDistance: undefined
-  },
-  // 树查询结果返回节点的总数
-  total: 0
-})
+export const tree = reactive(initTree
+)
 // 父数据字典表格数据
-export const table = reactive({
-  tableData: [],
-  total: 0,
-  listLoading: true,
-  listQuery: {
-    page: 1,
-    size: 20,
-    parentId: undefined,
-    name: '',
-    code: '',
-    description: '',
-    status: undefined
-  },
-  // 状态选择器
-  statusSelect: []
-})
+export const table = reactive(initTable)
 // 对话框
 export const dialog = reactive({
   // 新增数据字典弹框
@@ -291,6 +246,7 @@ export function clearHasNext(node) {
 // 加载下一页的数据
 export function loadNextPageData() {
   tree.listQuery.page = tree.listQuery.page + 1
+  tree.listQuery.parentId = toRaw(tree).chec
   Object.assign(tree.listQuery.parentId, tree.checkedNodeDropdown.data.id)
   tree.listQuery.minDistance = 1
   tree.listQuery.maxDistance = 1
