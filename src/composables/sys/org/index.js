@@ -419,7 +419,6 @@ export function filterTableType(value, row, column) {
 }
 // 根据状态刷新表格
 export function filterTableStatus(value, row, column) {
-  console.log('筛选表格:', value)
   // 重置查询条件
   resetQuery(table)
   table.listQuery.status = value
