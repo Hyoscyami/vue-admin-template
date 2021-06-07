@@ -284,7 +284,6 @@ export function delRow(row) {
 export async function loadNode(node, resolve) {
   tree.checkedNodeDropdown = node
   if (node.level === 0) {
-    console.log('初始化树', node)
     // 最开始的时候，默认根节点被选中
     // 默认展开第二级
     nextTick(() => {

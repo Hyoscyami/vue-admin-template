@@ -55,6 +55,7 @@
           v-loading="table.listLoading"
           :data="table.tableData"
           style="width: 100%"
+          @filter-change="filterTableType"
         >
           <el-table-column
             type="selection"
@@ -75,8 +76,8 @@
           <el-table-column
             prop="type"
             label="类型"
+            column-key="type"
             :filters="table.typeSelect"
-            :filter-method="filterTableType"
             :formatter="convertTypeToChinese"
           />
           <el-table-column
